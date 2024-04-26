@@ -62,7 +62,7 @@ class Incident(models.Model):
     name = models.CharField("Название", max_length=100)
     description = models.TextField("Описание")
     created_at = models.DateTimeField("Создан")
-    results = models.JSONField("Результаты")
+    results = models.JSONField("Результаты", null=True, blank=True)
 
     creator_id = models.ForeignKey(Expert, on_delete=models.CASCADE,
                                    related_name="authored_incidents")
