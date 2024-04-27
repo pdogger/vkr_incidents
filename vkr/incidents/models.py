@@ -115,6 +115,7 @@ class IncidentExpert(models.Model):
     incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
     expert = models.ForeignKey(Expert, verbose_name="Эксперт", on_delete=models.CASCADE)
     expert_number = models.PositiveSmallIntegerField("Номер")
+    scores = models.JSONField("Оценки", null=True, blank=True)
 
     class Meta:
         verbose_name = "Эксперт по инциденту"

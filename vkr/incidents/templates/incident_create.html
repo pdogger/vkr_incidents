@@ -1,6 +1,12 @@
 <form action="/incident/create" method="post">
     {% csrf_token %}
     {{ form_incident }}
-    {{ expert_formset }}
     <input type="submit" value="Submit">
 </form>
+
+{% block scripts %}
+
+<script>
+
+</script>
+{% endblock %}
