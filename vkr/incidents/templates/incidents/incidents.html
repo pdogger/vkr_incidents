@@ -42,10 +42,21 @@
           <div class="row justify-content-between align-items-center pt-3 border-top">
             <p class="col card-subtitle text-success">· {{ incident.status }}</p>
             <a href="{% url 'incident' incident.id %}" class="col-4 btn btn-primary px-3 py-2">Перейти к инциденту</a>
-            <p class="col card-subtitle text-muted text-end">{{ incident.created_at }}</p>
+            <div class="col">
+                <p class="card-subtitle text-muted text-end">{{ incident.created_at|date }}</p>
+                <p class="card-subtitle text-muted text-end">{{ incident.created_at|time }}</p>
+            </div>
           </div>
         </div>
       </div>
+    {% empty %}
+    <div class="empty-incidents d-flex flex-column align-items-center justify-content-center">
+        <div class="text-center mb-4">
+            В данный момент инциденты в базе отсутствуют.
+        </div>
+        <a href="{% url 'incident_create' %}" class="btn-create btn btn-primary p-3 w-100">Инициировать решение инцидента</a>
+    </div>
     {% endfor %}
 </div>
+
 {% endblock %}

@@ -2,11 +2,12 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
-from django.http import Http404, HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.paginator import Paginator
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 
-from .models import Incident, Expert, IncidentExpert
+from .models import Incident, Expert, IncidentExpert, Strategy
 from .forms import IncidentCreateForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -31,24 +32,21 @@ def signin(request):
                 login(request, user)
                 return redirect('incidents')
 
-        print(dir(form))
         return render(request, 'incidents/login.html', {'form': form})
 
 
 @login_required(login_url='login')
-def index(request):
-    return redirect('incidents')
-
-
-@login_required(login_url='login')
-def incidents_list(request):
+def incidents_list(request) -> HttpResponse:
     incidents = Incident.objects.all()
-    return render(request, "incidents/incidents.html", {
-            'incidents': incidents})
+    # paginator = Paginator(incidents, 1)
+
+    # page_number = request.GET.get("page")
+    # page_obj = paginator.get_page(page_number)
+    return render(request, "incidents/incidents.html", {"incidents": incidents})
 
 
 @login_required(login_url='login')
-def incident_create(request):
+def incident_create(request) -> HttpResponseRedirect | HttpResponse:
     if request.method == 'POST':
         form_incident = IncidentCreateForm(request.POST)
         if form_incident.is_valid():
@@ -66,7 +64,7 @@ def incident_create(request):
 
     return render(request, "incidents/incident_create.html", {"form_incident": form_incident})
 
-def incident_delete(request):
+def incident_delete(request) -> HttpResponse:
     incident_id = request.DELETE['incident_id']
     try:
         Incident.objects.get(id=incident_id).delete()

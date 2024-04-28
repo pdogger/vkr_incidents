@@ -1,11 +1,12 @@
-from django.urls import path, reverse_lazy
 from django.contrib.auth.views import LogoutView
+from django.urls import path, reverse_lazy
+from django.views.generic.base import RedirectView
 
 from . import views
 
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("", RedirectView.as_view(url=reverse_lazy('incidents')), name="index"),
     path("incident/<int:incident_id>", views.incident, name="incident"),
     path("incidents", views.incidents_list, name="incidents"),
     path("incident/create", views.incident_create, name="incident_create"),

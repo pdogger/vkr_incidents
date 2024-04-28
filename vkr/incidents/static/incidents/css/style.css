@@ -29,12 +29,10 @@ body {
     text-decoration: none;
     border-radius: 5px;
     border-width: 0;
-    transition: transform .1s ease;
 }
 
 .logout-btn:hover {
     background-color: #c93434;
-    transform: scale(102%);
 }
 
 .active {
@@ -43,4 +41,8 @@ body {
 
 .card {
     width: 40%;
+}
+
+.empty-incidents {
+    min-height: 75vh;
 }
