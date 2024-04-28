@@ -75,9 +75,8 @@ def incident_delete(request):
     return render(request, "incidents/incident_delete.html")
 
 @login_required(login_url='login')
-def incident(request):
+def incident(request, incident_id):
     if request.method == 'GET':
-        incident_id = request.GET['incident_id']
         try:
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:

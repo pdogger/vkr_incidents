@@ -41,7 +41,7 @@
           <p class="card-text">{{ incident.description|truncatechars:360 }}</p>
           <div class="row justify-content-between align-items-center pt-3 border-top">
             <p class="col card-subtitle text-success">· {{ incident.status }}</p>
-            <a href="#" class="col-4 btn btn-primary px-3 py-2">Перейти к инциденту</a>
+            <a href="{% url 'incident' incident.id %}" class="col-4 btn btn-primary px-3 py-2">Перейти к инциденту</a>
             <p class="col card-subtitle text-muted text-end">{{ incident.created_at }}</p>
           </div>
         </div>
