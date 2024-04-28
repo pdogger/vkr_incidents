@@ -11,7 +11,7 @@
 body {
     margin: 5rem 0 0 0;
     font-family: var(--font-family);
-    font-weight: 500;
+    font-weight: 400;
     line-height: normal;
     background-color: rgb(250, 254, 251);
     color: #19171a;
@@ -39,4 +39,8 @@ body {
 
 .active {
     border-bottom: 2px solid #4b464ed3;
+}
+
+.card {
+    width: 40%;
 }

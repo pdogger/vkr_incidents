@@ -33,12 +33,19 @@
 {% endblock %}
 
 {% block content %}
+<div class="cards d-flex p-2 flex-column align-items-center">
     {% for incident in incidents %}
-    <div>
-        {{ incident.name }}
-    </div>
-    <div>
-        {{ incident.description }}
-    </div>
+    <div class="card mb-3">
+        <div class="card-body m-2 mb-1">
+          <h5 class="card-title">{{ incident.name|truncatechars:120 }}</h5>
+          <p class="card-text">{{ incident.description|truncatechars:360 }}</p>
+          <div class="row justify-content-between align-items-center pt-3 border-top">
+            <p class="col card-subtitle text-success">· {{ incident.status }}</p>
+            <a href="#" class="col-4 btn btn-primary px-3 py-2">Перейти к инциденту</a>
+            <p class="col card-subtitle text-muted text-end">{{ incident.created_at }}</p>
+          </div>
+        </div>
+      </div>
     {% endfor %}
+</div>
 {% endblock %}
