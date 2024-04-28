@@ -29,26 +29,10 @@ def signin(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('index')
+                return redirect('incidents_get')
 
         print(dir(form))
         return render(request, 'incidents/login.html', {'form': form})
-
-
-def check_all_experts_done(incident: Incident) -> bool:
-    for e in incident.experts.all():
-        if IncidentExpert.objects.filter(incident_id=incident.id, expert_id=e.id,
-                                         scores__isnull = True).count() > 0:
-            return False
-    return True
-
-def get_all_scores(incident: Incident) -> list:
-    scores = []
-
-    # TODO упорядочить по номеру эксперта
-    for e in incident.experts.all():
-        scores.append(IncidentExpert.objects.get(incident_id=incident.id, expert_id=e.id).scores)
-    return scores
 
 
 @login_required(login_url='login')

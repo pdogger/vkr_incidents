@@ -1,6 +1,9 @@
 from methods import AHPProcessor, RankingProcessor, PayoffMatrixProcessor
 import numpy as np
 
+from incidents.models import Incident, IncidentExpert
+
+
 def get_ahp_values(matrices: dict) -> dict:
     result = dict()
     for key in matrices["S"].keys():
@@ -8,6 +11,7 @@ def get_ahp_values(matrices: dict) -> dict:
         result[key] = ahp.calculate_values()
 
     return result
+
 
 # Ожидается порядок оценок в соответствии с номером эксперта
 def calculate_incident(scores: list) -> dict:
@@ -24,3 +28,20 @@ def calculate_incident(scores: list) -> dict:
     pmp = PayoffMatrixProcessor(prepared_payoff_matrix)
     pmp.calculate_estimates()
     return pmp.calculate_values()
+
+
+def check_all_experts_done(incident: Incident) -> bool:
+    for e in incident.experts.all():
+        if IncidentExpert.objects.filter(incident_id=incident.id, expert_id=e.id,
+                                         scores__isnull = True).count() > 0:
+            return False
+    return True
+
+
+def get_all_scores(incident: Incident) -> list:
+    scores = []
+
+    # TODO упорядочить по номеру эксперта
+    for e in incident.experts.all():
+        scores.append(IncidentExpert.objects.get(incident_id=incident.id, expert_id=e.id).scores)
+    return scores
