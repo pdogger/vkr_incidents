@@ -1,4 +1,5 @@
 import datetime
+from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -7,13 +8,16 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Incident, Expert, IncidentExpert
 from .forms import IncidentCreateForm
-from .calculate import calculate_incident
+from .utils.calculate import calculate_incident
 
 
 def signin(request):
     if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect('index')
+
         form = AuthenticationForm()
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'incidents/login.html', {'form': form})
 
     elif request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -21,19 +25,20 @@ def signin(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
 
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-
                 return redirect('index')
 
-        return render(request, 'login.html', {'form': form})
+        print(dir(form))
+        return render(request, 'incidents/login.html', {'form': form})
 
 
 def check_all_experts_done(incident: Incident) -> bool:
     for e in incident.experts.all():
-        if IncidentExpert.objects.filter(incident_id=incident.id, expert_id=e.id, scores__isnull = True).count() > 0:
+        if IncidentExpert.objects.filter(incident_id=incident.id, expert_id=e.id,
+                                         scores__isnull = True).count() > 0:
             return False
     return True
 
@@ -48,13 +53,13 @@ def get_all_scores(incident: Incident) -> list:
 
 @login_required(login_url='login')
 def index(request):
-    return render(request, "base.html")
+    return redirect('incidents_get')
 
 
 @login_required(login_url='login')
 def incidents_list(request):
     incidents = Incident.objects.all()
-    return render(request, "incidents.html", {
+    return render(request, "incidents/incidents.html", {
             'incidents': incidents})
 
 
@@ -64,16 +69,18 @@ def incident_create(request):
         form_incident = IncidentCreateForm(request.POST)
         if form_incident.is_valid():
             creator, _ = Expert.objects.get_or_create(user_id=request.user.id)
-            incident = Incident.objects.create(name=form_incident.cleaned_data['name'],
-                                                description=form_incident.cleaned_data['description'],
-                                                  creator_id=creator, status_id=1,
-                                                    created_at=datetime.datetime.now())
+            incident = Incident.objects.create(
+                name=form_incident.cleaned_data['name'],
+                description=form_incident.cleaned_data['description'],
+                creator_id=creator, status_id=1,
+                created_at=datetime.datetime.now()
+            )
             return HttpResponseRedirect(f"/incident?incident_id={incident.id}")
 
     else:
         form_incident = IncidentCreateForm()
 
-    return render(request, "incident_create.html", {"form_incident": form_incident})
+    return render(request, "incidents/incident_create.html", {"form_incident": form_incident})
 
 def incident_delete(request):
     incident_id = request.DELETE['incident_id']
@@ -81,7 +88,7 @@ def incident_delete(request):
         Incident.objects.get(id=incident_id).delete()
     except Incident.DoesNotExist:
         raise Http404("Инцидент не существует")
-    return render(request, "incident_delete.html")
+    return render(request, "incidents/incident_delete.html")
 
 @login_required(login_url='login')
 def incident(request):
@@ -91,7 +98,7 @@ def incident(request):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
-        return render(request, "incident.html", {
+        return render(request, "incidents/incident.html", {
             'incident': incident})
     if request.method == 'DELETE':
         return incident_delete(request)
@@ -115,7 +122,8 @@ def incident_assessment(request):
             except Expert.DoesNotExist:
                 raise Http404("Эксперт не существует")
 
-            incident_expert = IncidentExpert.objects.get(incident_id=incident_id, expert_id=expert_id)
+            incident_expert = IncidentExpert.objects.get(incident_id=incident_id,
+                                                         expert_id=expert_id)
             incident_expert.scores = form_inc_assessment.cleaned_data['scores']
             incident_expert.save()
 
@@ -129,4 +137,5 @@ def incident_assessment(request):
     else:
         form_inc_assessment = IncidentAssessmentForm()
 
-    return render(request, "incident_assessment.html", {"form_inc_assessment": form_inc_assessment})
+    return render(request, "incidents/incident_assessment.html",
+                  {"form_inc_assessment": form_inc_assessment})

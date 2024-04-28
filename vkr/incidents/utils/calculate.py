@@ -1,4 +1,4 @@
-from ..methods import AHPProcessor, RankingProcessor, PayoffMatrixProcessor
+from methods import AHPProcessor, RankingProcessor, PayoffMatrixProcessor
 import numpy as np
 
 def get_ahp_values(matrices: dict) -> dict:
@@ -14,7 +14,7 @@ def calculate_incident(scores: list) -> dict:
     ahp_values = []
     for score in scores:
         ahp_values.append(get_ahp_values(score))
-    
+
     rp_values = dict()
     for basis in ahp_values[0].keys():
         rp = RankingProcessor(np.stack([a[basis]["V"]  for a in ahp_values ]))
