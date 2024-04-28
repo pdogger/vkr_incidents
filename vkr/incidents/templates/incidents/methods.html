@@ -11,9 +11,9 @@
         <a class="navbar-brand" href="#"></a>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav ">
-            <li class="nav-item px-5"><a class="nav-link" href="/incidents">Инциденты</a></li>
-            <li class="nav-item px-5"><a class="nav-link active" href="#">Методы</a></li>
-            <li class="nav-item px-5"><a class="nav-link" href="/examples">Примеры</a></li>
+            <li class="nav-item px-5"><a class="nav-link" href="{% url 'incidents' %}">Инциденты</a></li>
+            <li class="nav-item px-5"><a class="nav-link active" href="{% url 'methods' %}">Методы</a></li>
+            <li class="nav-item px-5"><a class="nav-link" href="{% url 'examples' %}">Примеры</a></li>
         </ul>
         </div>
         <ul class="navbar-nav position-fixed end-0 me-5">

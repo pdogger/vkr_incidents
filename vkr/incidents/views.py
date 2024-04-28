@@ -8,7 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Incident, Expert, IncidentExpert
 from .forms import IncidentCreateForm
-from .utils.calculate import calculate_incident
+from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
 def signin(request):
@@ -29,7 +29,7 @@ def signin(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('incidents_get')
+                return redirect('incidents')
 
         print(dir(form))
         return render(request, 'incidents/login.html', {'form': form})
@@ -37,7 +37,7 @@ def signin(request):
 
 @login_required(login_url='login')
 def index(request):
-    return redirect('incidents_get')
+    return redirect('incidents')
 
 
 @login_required(login_url='login')
