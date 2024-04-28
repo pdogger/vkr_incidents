@@ -123,3 +123,13 @@ def incident_assessment(request):
 
     return render(request, "incidents/incident_assessment.html",
                   {"form_inc_assessment": form_inc_assessment})
+
+@login_required(login_url='login')
+def examples(request):
+    if request.method == 'GET':
+        return render(request, "incidents/examples.html")
+
+@login_required(login_url='login')
+def methods(request):
+    if request.method == 'GET':
+        return render(request, "incidents/methods.html")
