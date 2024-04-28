@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 
 
 class Basis(models.Model):
-    description = models.CharField("Описание", max_length=200)
+    name = models.CharField("Название", max_length=100)
+    description = models.TextField("Описание")
 
     def __str__(self) -> str:
-        return self.description
+        return self.name
 
     class Meta:
         verbose_name = "Базис"
