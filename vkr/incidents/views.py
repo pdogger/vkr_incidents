@@ -4,10 +4,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
+from django.db.models import Case, Count, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 
-from .models import Incident, Expert, IncidentExpert, Strategy
+from .models import Incident, Expert, IncidentExpert
 from .forms import IncidentCreateForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -37,7 +38,11 @@ def signin(request):
 
 @login_required(login_url='login')
 def incidents_list(request) -> HttpResponse:
-    incidents = Incident.objects.all()
+    incidents = Incident.objects.all().annotate(
+        is_creator=Count(Case(When(creator__user=request.user, then=1))),
+        is_expert=Count(Case(When(experts__user=request.user, then=1)))
+    ).order_by('-is_creator', '-is_expert', 'status', '-created_at')
+
     # paginator = Paginator(incidents, 1)
 
     # page_number = request.GET.get("page")
@@ -54,7 +59,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident = Incident.objects.create(
                 name=form_incident.cleaned_data['name'],
                 description=form_incident.cleaned_data['description'],
-                creator_id=creator, status_id=1,
+                creator=creator, status_id=1,
                 created_at=datetime.datetime.now()
             )
             return HttpResponseRedirect(f"/incident?incident_id={incident.id}")

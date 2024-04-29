@@ -65,8 +65,8 @@ class Incident(models.Model):
     created_at = models.DateTimeField("Создан")
     results = models.JSONField("Результаты", null=True, blank=True)
 
-    creator_id = models.ForeignKey(Expert, verbose_name="Инициатор", on_delete=models.CASCADE,
-                                   related_name="authored_incidents")
+    creator = models.ForeignKey(Expert, verbose_name="Инициатор", on_delete=models.CASCADE,
+                                related_name="authored_incidents")
     status = models.ForeignKey(Status, verbose_name="Статус", on_delete=models.CASCADE)
 
     basises = models.ManyToManyField(Basis, through="IncidentBasis")
