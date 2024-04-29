@@ -44,3 +44,9 @@ admin.site.register(Expert)
 admin.site.register(Incident, IncidentAdmin)
 admin.site.register(Status)
 admin.site.register(Strategy)
+
+
+admin.site.register(IncidentBasis)
+admin.site.register(IncidentCritery)
+admin.site.register(IncidentExpert)
+admin.site.register(IncidentStrategy)

@@ -14,4 +14,5 @@ urlpatterns = [
     path("logout", LogoutView.as_view(), name="logout"),
     path("examples", views.examples, name="examples"),
     path("methods", views.methods, name="methods"),
+    path("tst", views.add_incident_experts, name="tst")
 ]

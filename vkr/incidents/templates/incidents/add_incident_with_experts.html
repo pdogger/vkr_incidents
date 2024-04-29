@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#add-expert').click(function() {
+                var form_idx = $('.expert-form').length;
+                var form = $('#empty-form').html().replace(/__prefix__/g, form_idx);
+                $('.expert-formset').append('<div class="expert-form">' + form + '</div>');
+                // Обновление значения TOTAL_FORMS
+                $('#id_incidentexpert_set-TOTAL_FORMS').val(form_idx + 1);
+            });
+
+            $('.remove-expert').click(function() {
+                $('.expert-form').last().remove();
+                // Обновление значения TOTAL_FORMS
+                var forms = $('.expert-form').length;
+                $('#id_incidentexpert_set-TOTAL_FORMS').val(forms);
+            });
+        });
+    </script>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        {{ incident_form.as_p }}
+        <div class="expert-formset">
+            {{ expert_formset.management_form }}
+            <div id="empty-form" style="display:none;">
+                {{ expert_formset.empty_form.as_p }}
+            </div>
+            {% for form in expert_formset.forms %}
+                <div class="expert-form">
+                    {{ form.as_p }}
+                    {% if forloop.first %}
+                        <button type="button" class="remove-expert">Remove expert</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-expert">Add expert</button>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

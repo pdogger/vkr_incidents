@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
-from .models import Expert
+from .models import Expert, Incident, IncidentExpert
 
 
 class IncidentCreateForm(forms.Form):
@@ -21,3 +21,17 @@ class LoginUserForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ['username', 'password']
+
+
+class IncidentForm(forms.ModelForm):
+    class Meta:
+        model = Incident
+        fields = ['name', 'description', 'creator', 'status', 'created_at']
+        widgets = {
+            'created_at': forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        }
+
+class ExpertForm(forms.ModelForm):
+    class Meta:
+        model = IncidentExpert
+        fields = ['expert', 'expert_number']
