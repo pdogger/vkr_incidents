@@ -2,14 +2,13 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 
 from .models import Incident, Expert, IncidentExpert
-from .forms import IncidentCreateForm
+from .forms import IncidentCreateForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
@@ -18,11 +17,11 @@ def signin(request):
         if request.user.is_authenticated:
             return redirect('index')
 
-        form = AuthenticationForm()
+        form = LoginUserForm()
         return render(request, 'incidents/login.html', {'form': form})
 
     elif request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = LoginUserForm(request, data=request.POST)
 
         if form.is_valid():
             username = form.cleaned_data['username']

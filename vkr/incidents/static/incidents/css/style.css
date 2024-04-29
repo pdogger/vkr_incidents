@@ -43,6 +43,10 @@ body {
     width: 40%;
 }
 
+.login-card {
+    width: 20%;
+}
+
 .empty-incidents {
     min-height: 75vh;
 }
