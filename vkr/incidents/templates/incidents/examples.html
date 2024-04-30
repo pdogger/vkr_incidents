@@ -16,12 +16,16 @@
             <li class="nav-item px-5"><a class="nav-link active" href="{% url 'examples' %}">Примеры</a></li>
         </ul>
         </div>
-        <ul class="navbar-nav position-fixed end-0 me-5">
-            <li class="nav-item px-3">
-                <span class="username">{{ request.user.get_name }} {{ request.user.get_surname }} ({{ request.user.get_username }})</span>
+        <ul class="navbar-nav position-fixed end-0 me-5 align-items-center">
+            <li class="nav-item px-3 text-end mb-1">
+                <div class="fullname">{{ request.user.get_full_name }}</div>
+                <div class="username">({{ request.user.get_username }})</div>
             </li>
             <li class="nav-item px-3">
-                <a href="#" class="logout-btn">Выйти</a>
+                <form action="{% url 'logout' %}" method="POST">
+                    {% csrf_token %}
+                    <button class="logout-btn" type="submit">Выйти</button>
+                </form>
             </li>
           </ul>
     </nav>
