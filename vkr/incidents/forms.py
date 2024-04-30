@@ -17,6 +17,12 @@ class LoginUserForm(AuthenticationForm):
 
 
 class IncidentForm(forms.ModelForm):
+    criteries_list = forms.ModelMultipleChoiceField(
+        queryset = Critery.objects.all(),
+        widget = forms.CheckboxSelectMultiple,
+        required = True
+    )
+
     class Meta:
         model = Incident
         fields = ['name', 'description']

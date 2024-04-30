@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert
+from .models import Incident, Expert, IncidentCritery, IncidentExpert
 from .forms import ExpertFormSet, IncidentForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -61,15 +61,23 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident.status_id = 1
             incident.save()
 
+            criteries = incident_form.cleaned_data['criteries_list']
+            for num, critery in enumerate(criteries):
+                IncidentCritery.objects.create(incident=incident,
+                                               critery=critery,
+                                               critery_number=num + 1)
+
             IncidentExpert.objects.create(incident=incident,
                                           expert=incident.creator,
                                           expert_number=1)
-            experts = expert_formset.save(commit=False)
-            for num, expert in enumerate(experts):
+            experts_related = expert_formset.save(commit=False)
+            for num, expert in enumerate(experts_related):
                 expert.expert_number = num + 2
                 expert.incident = incident
                 expert.save()
+
             return redirect('incidents')
+
     elif request.method == 'GET':
         incident_form = IncidentForm()
         expert_formset = ExpertFormSet()
@@ -84,6 +92,7 @@ def incident_delete(request) -> HttpResponse:
     except Incident.DoesNotExist:
         raise Http404("Инцидент не существует")
     return render(request, "incidents/incident_delete.html")
+
 
 @login_required(login_url='login')
 def incident(request, incident_id):
@@ -100,6 +109,7 @@ def incident(request, incident_id):
 
     if request.method == 'DELETE':
         return incident_delete(request)
+
 
 # Несуществующая форма пока что
 def incident_assess(request, incident_id):
@@ -139,10 +149,12 @@ def incident_assess(request, incident_id):
     return render(request, "incidents/incident_assess.html",
                   {"form_inc_assess": form_inc_assess})
 
+
 @login_required(login_url='login')
 def examples(request):
     if request.method == 'GET':
         return render(request, "incidents/examples.html")
+
 
 @login_required(login_url='login')
 def methods(request):
