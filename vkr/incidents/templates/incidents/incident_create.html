@@ -6,17 +6,41 @@
         $(document).ready(function() {
             $('#add-expert').click(function() {
                 var form_idx = $('.expert-form').length;
-                var form = $('#empty-form').html().replace(/__prefix__/g, form_idx);
+                var form = $('#empty-expert-form').html().replace(/__prefix__/g, form_idx);
                 $('.expert-formset').append('<div class="expert-form">' + form + '</div>');
-                // Обновление значения TOTAL_FORMS
                 $('#id_incidentexpert_set-TOTAL_FORMS').val(form_idx + 1);
             });
 
             $('.remove-expert').click(function() {
                 $('.expert-form').last().remove();
-                // Обновление значения TOTAL_FORMS
                 var forms = $('.expert-form').length;
                 $('#id_incidentexpert_set-TOTAL_FORMS').val(forms);
+            });
+
+            $('#add-basis').click(function() {
+                var form_idx = $('.basis-form').length;
+                var form = $('#empty-basis-form').html().replace(/__prefix__/g, form_idx);
+                $('.basis-formset').append('<div class="basis-form">' + form + '</div>');
+                $('#id_incidentbasis-TOTAL_FORMS').val(form_idx + 1);
+            });
+
+            $('.remove-basis').click(function() {
+                $('.basis-form').last().remove();
+                var forms = $('.basis-form').length;
+                $('#id_incidentbasis-TOTAL_FORMS').val(forms);
+            });
+
+            $('#add-strategy').click(function() {
+                var form_idx = $('.strategy-form').length;
+                var form = $('#empty-strategy-form').html().replace(/__prefix__/g, form_idx);
+                $('.strategy-formset').append('<div class="strategy-form">' + form + '</div>');
+                $('#id_incidentstrategy-TOTAL_FORMS').val(form_idx + 1);
+            });
+
+            $('.remove-strategy').click(function() {
+                $('.strategy-form').last().remove();
+                var forms = $('.strategy-form').length;
+                $('#id_incidentstrategy-TOTAL_FORMS').val(forms);
             });
         });
     </script>
@@ -27,7 +51,7 @@
         {{ incident_form.as_p }}
         <div class="expert-formset">
             {{ expert_formset.management_form }}
-            <div id="empty-form" style="display:none;">
+            <div id="empty-expert-form" style="display:none;">
                 {{ expert_formset.empty_form.as_p }}
             </div>
             {% for form in expert_formset.forms %}
@@ -40,6 +64,39 @@
             {% endfor %}
         </div>
         <button type="button" id="add-expert">Add expert</button>
+
+        <div class="basis-formset">
+            {{ basis_formset.management_form }}
+            <div id="empty-basis-form" style="display:none;">
+                {{ basis_formset.empty_form.as_p }}
+            </div>
+            {% for form in basis_formset.forms %}
+                <div class="basis-form">
+                    {{ form.as_p }}
+                    {% if forloop.first %}
+                        <button type="button" class="remove-basis">Remove basis</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-basis">Add basis</button>
+
+        <div class="strategy-formset">
+            {{ strategy_formset.management_form }}
+            <div id="empty-strategy-form" style="display:none;">
+                {{ strategy_formset.empty_form.as_p }}
+            </div>
+            {% for form in strategy_formset.forms %}
+                <div class="strategy-form">
+                    {{ form.as_p }}
+                    {% if forloop.first %}
+                        <button type="button" class="remove-strategy">Remove strategy</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-strategy">Add strategy</button>
+
         <button type="submit">Submit</button>
     </form>
 </body>

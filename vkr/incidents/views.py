@@ -7,8 +7,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert
-from .forms import ExpertFormSet, IncidentForm, LoginUserForm
+from .models import Basis, Incident, Expert, IncidentBasis, IncidentExpert, IncidentStrategy, Strategy
+from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
@@ -53,6 +53,8 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
     if request.method == 'POST':
         incident_form = IncidentForm(request.POST)
         expert_formset = ExpertFormSet(request.POST)
+        basis_formset = BasisFormSet(request.POST, prefix='incidentbasis')
+        strategy_formset = StrategyFormSet(request.POST, prefix='incidentstrategy')
 
         if incident_form.is_valid() and expert_formset.is_valid():
             incident = incident_form.save(commit=False)
@@ -76,12 +78,25 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                 expert.incident = incident
                 expert.save()
 
+            for num, basis_data in enumerate(basis_formset.cleaned_data):
+                basis = Basis.objects.create(**basis_data)
+                IncidentBasis.objects.create(incident=incident, basis=basis, basis_number=num + 1)
+
+            for num, strategy_data in enumerate(strategy_formset.cleaned_data):
+                strategy = Strategy.objects.create(**strategy_data)
+                IncidentStrategy.objects.create(incident=incident,
+                                                strategy=strategy,
+                                                strategy_number=num + 1)
+
             return redirect('incidents')
     elif request.method == 'GET':
         incident_form = IncidentForm()
         expert_formset = ExpertFormSet()
+        basis_formset = BasisFormSet(prefix='incidentbasis')
+        strategy_formset = StrategyFormSet(prefix='incidentstrategy')
     return render(request, 'incidents/incident_create.html',
-                  {'incident_form': incident_form, 'expert_formset': expert_formset})
+                  {'incident_form': incident_form, 'expert_formset': expert_formset,
+                   'basis_formset': basis_formset, 'strategy_formset': strategy_formset})
 
 
 @login_required(login_url='login')

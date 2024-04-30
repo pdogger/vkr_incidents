@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
-from .models import Incident, IncidentCritery, IncidentExpert, Critery
+from .models import Basis, Incident, IncidentBasis, IncidentCritery, IncidentExpert, Critery, Strategy
 
 
 class LoginUserForm(AuthenticationForm):
@@ -40,5 +40,40 @@ ExpertFormSet = forms.inlineformset_factory(
     form=IncidentExpertForm,
     extra=1,
     max_num=6,
-    can_delete=False
+    can_delete=False,
+    validate_max=True
+)
+
+
+class BasisForm(forms.ModelForm):
+    class Meta:
+        model = Basis
+        fields = ['name', 'description']
+
+
+BasisFormSet = forms.formset_factory(
+    BasisForm,
+    extra=0,
+    can_delete=False,
+    min_num=1,
+    validate_min=True,
+    max_num=7,
+    validate_max=True
+)
+
+
+class StrategyForm(forms.ModelForm):
+    class Meta:
+        model = Strategy
+        fields = ['name', 'description']
+
+
+StrategyFormSet = forms.formset_factory(
+    StrategyForm,
+    extra=0,
+    can_delete=False,
+    min_num=2,
+    validate_min=True,
+    max_num=7,
+    validate_max=True
 )
