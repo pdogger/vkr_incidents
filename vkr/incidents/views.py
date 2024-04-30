@@ -123,44 +123,41 @@ def incident(request, incident_id):
         return render(request, "incidents/incident.html", {
             'incident': incident, 'experts_with_scores': experts_with_scores})
 
-
-# Несуществующая форма пока что
+@login_required(login_url='login')
 def incident_assess(request, incident_id):
-    if request.method == 'GET':
-        return HttpResponse("В разработке")
     if request.method == 'POST':
-        form_inc_assess = IncidentAssessForm(request.POST)
-        if form_inc_assess.is_valid():
+        print(request.POST["username"])
+        # expert_id = request.user.id
 
-            expert_id = request.user.id
+        # try:
+        #     incident = Incident.objects.get(id=incident_id)
+        # except Incident.DoesNotExist:
+        #     raise Http404("Инцидент не существует")
 
-            try:
-                incident = Incident.objects.get(id=incident_id)
-            except Incident.DoesNotExist:
-                raise Http404("Инцидент не существует")
+        # try:
+        #     expert = Expert.objects.get(id=expert_id)
+        # except Expert.DoesNotExist:
+        #     raise Http404("Эксперт не существует")
 
-            try:
-                expert = Expert.objects.get(id=expert_id)
-            except Expert.DoesNotExist:
-                raise Http404("Эксперт не существует")
+        # incident_expert = IncidentExpert.objects.get(incident=incident,
+        #                                                 expert=expert)
+        # incident_expert.scores = form_inc_assess.cleaned_data['scores']
+        # incident_expert.save()
 
-            incident_expert = IncidentExpert.objects.get(incident=incident,
-                                                         expert=expert)
-            incident_expert.scores = form_inc_assess.cleaned_data['scores']
-            incident_expert.save()
+        # if check_all_experts_done(incident):
+        #     incident.status = "Оценен"
+        #     incident.results = calculate_incident(get_all_scores(incident))
+        #     incident.save()
 
-            if check_all_experts_done(incident):
-                incident.status = "Оценен"
-                incident.results = calculate_incident(get_all_scores(incident))
-                incident.save()
-
-            return HttpResponseRedirect(f"/incident/{incident_id}")
+        return HttpResponse(status=200)
 
     else:
-        form_inc_assess = IncidentAssessForm()
-
-    return render(request, "incidents/incident_assess.html",
-                  {"form_inc_assess": form_inc_assess})
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            raise Http404("Инцидент не существует")
+        return render(request, "incidents/incident_assess.html",{
+            'incident': incident})
 
 
 @login_required(login_url='login')
