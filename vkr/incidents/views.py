@@ -1,4 +1,3 @@
-import datetime
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -6,6 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Case, Count, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from .models import Incident, Expert, IncidentExpert
 from .forms import ExpertFormSet, IncidentCreateForm, IncidentForm, LoginUserForm
@@ -38,9 +38,8 @@ def signin(request):
 @login_required(login_url='login')
 def incidents_list(request) -> HttpResponse:
     incidents = Incident.objects.all().annotate(
-        is_creator=Count(Case(When(creator__user=request.user, then=1))),
         is_expert=Count(Case(When(experts__user=request.user, then=1)))
-    ).order_by('-is_creator', '-is_expert', 'status', '-created_at')
+    ).order_by('-is_expert', 'status', '-created_at')
 
     # paginator = Paginator(incidents, 1)
 
@@ -59,7 +58,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                 name=form_incident.cleaned_data['name'],
                 description=form_incident.cleaned_data['description'],
                 creator=creator, status_id=1,
-                created_at=datetime.datetime.now()
+                created_at=timezone.now()
             )
             return HttpResponseRedirect(f"/incident?incident_id={incident.id}")
 
@@ -83,13 +82,13 @@ def incident(request, incident_id):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
-        
+
         try:
             expert = IncidentExpert.objects.get(incident_id=incident_id, expert_id=request.user.id)
         except IncidentExpert.DoesNotExist:
             return render(request, "incidents/incident.html", {
             'incident': incident, 'expert': None})
-        
+
         return render(request, "incidents/incident.html", {
             'incident': incident, 'expert': expert})
     if request.method == 'DELETE':
@@ -151,10 +150,11 @@ def add_incident_experts(request):
 
         if incident_form.is_valid() and expert_formset.is_valid():
             incident = incident_form.save(commit=False)
-            incident.created_at = datetime.datetime.now()
-            incident.creator = Expert.objects.get(user=request.user)
+            incident.created_at = timezone.now()
+            incident.creator = Expert.objects.filter(user=request.user).first()
             incident.status_id = 1
             incident.save()
+
             experts = expert_formset.save(commit=False)
             for num, expert in enumerate(experts):
                 expert.expert_number = num + 1

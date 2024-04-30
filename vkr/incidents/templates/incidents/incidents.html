@@ -38,11 +38,11 @@
     <div class="card mb-3 {% if incident.is_expert == 1 %}border-success{% endif %}">
         <div class="card-body m-2 mb-1">
           <h5 class="card-title">{{ incident.name|truncatechars:120 }}</h5>
-          <p class="card-text">{{ incident.description|truncatechars:360 }}</p>
+          <p class="card-text">{{ incident.description|linebreaks|truncatechars:360 }}</p>
           <div class="row justify-content-between align-items-center pt-3 border-top">
             <div class="col">
                 <p class="card-subtitle text-warning mb-1"><i class="bi bi-info-circle"></i> {{ incident.status }}</p>
-                <p class="card-subtitle text-muted"><i class="bi bi-person-gear"></i> {{ incident.creator }}</p>
+                <p class="card-subtitle text-muted"><i class="bi bi-person-gear"></i> {{ incident.creator.user.get_username  }}</p>
             </div>
             <a href="{% url 'incident' incident.id %}" class="col-4 btn btn-primary px-3 py-2">Перейти к инциденту</a>
             <div class="col">
