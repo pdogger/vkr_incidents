@@ -90,6 +90,7 @@ class IncidentBasis(models.Model):
     class Meta:
         verbose_name = "Базис инцидента"
         verbose_name_plural = "Базисы инцидента"
+        unique_together = ('incident', 'basis',)
 
 
 class IncidentCritery(models.Model):
@@ -100,6 +101,7 @@ class IncidentCritery(models.Model):
     class Meta:
         verbose_name = "Критерий ранжирования инцидента"
         verbose_name_plural = "Критерии ранжирования инцидента"
+        unique_together = ('incident', 'critery',)
 
 
 class IncidentStrategy(models.Model):
@@ -110,6 +112,7 @@ class IncidentStrategy(models.Model):
     class Meta:
         verbose_name = "Стратегия устранения инцидента"
         verbose_name_plural = "Стратегии устранения инцидента"
+        unique_together = ('incident', 'strategy',)
 
 
 class IncidentExpert(models.Model):
@@ -121,3 +124,4 @@ class IncidentExpert(models.Model):
     class Meta:
         verbose_name = "Эксперт по инциденту"
         verbose_name_plural = "Эксперты по инциденту"
+        unique_together = ('incident', 'expert',)
