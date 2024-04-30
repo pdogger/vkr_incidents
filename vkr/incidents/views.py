@@ -51,21 +51,28 @@ def incidents_list(request) -> HttpResponse:
 @login_required(login_url='login')
 def incident_create(request) -> HttpResponseRedirect | HttpResponse:
     if request.method == 'POST':
-        form_incident = IncidentCreateForm(request.POST)
-        if form_incident.is_valid():
-            creator, _ = Expert.objects.get_or_create(user_id=request.user.id)
-            incident = Incident.objects.create(
-                name=form_incident.cleaned_data['name'],
-                description=form_incident.cleaned_data['description'],
-                creator=creator, status_id=1,
-                created_at=timezone.now()
-            )
-            return HttpResponseRedirect(f"/incident?incident_id={incident.id}")
+        incident_form = IncidentForm(request.POST)
+        expert_formset = ExpertFormSet(request.POST)
 
-    else:
-        form_incident = IncidentCreateForm()
+        if incident_form.is_valid() and expert_formset.is_valid():
+            incident = incident_form.save(commit=False)
+            incident.created_at = timezone.now()
+            incident.creator = Expert.objects.filter(user=request.user).first()
+            incident.status_id = 1
+            incident.save()
+            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
+            experts = expert_formset.save(commit=False)
+            for num, expert in enumerate(experts):
+                expert.expert_number = num + 2
+                expert.incident = incident
+                expert.save()
+            return redirect('incidents')
+    elif request.method == 'GET':
+        incident_form = IncidentForm()
+        expert_formset = ExpertFormSet()
+    return render(request, 'incidents/incident_create.html',
+                  {'incident_form': incident_form, 'expert_formset': expert_formset})
 
-    return render(request, "incidents/incident_create.html", {"form_incident": form_incident})
 
 def incident_delete(request) -> HttpResponse:
     incident_id = request.DELETE['incident_id']
@@ -137,29 +144,3 @@ def examples(request):
 def methods(request):
     if request.method == 'GET':
         return render(request, "incidents/methods.html")
-
-
-@login_required(login_url='login')
-def add_incident_experts(request):
-    if request.method == 'POST':
-        incident_form = IncidentForm(request.POST)
-        expert_formset = ExpertFormSet(request.POST)
-
-        if incident_form.is_valid() and expert_formset.is_valid():
-            incident = incident_form.save(commit=False)
-            incident.created_at = timezone.now()
-            incident.creator = Expert.objects.filter(user=request.user).first()
-            incident.status_id = 1
-            incident.save()
-            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
-            experts = expert_formset.save(commit=False)
-            for num, expert in enumerate(experts):
-                expert.expert_number = num + 2
-                expert.incident = incident
-                expert.save()
-            return redirect('incidents')
-    else:
-        incident_form = IncidentForm()
-        expert_formset = ExpertFormSet()
-    return render(request, 'incidents/add_incident_with_experts.html',
-                  {'incident_form': incident_form, 'expert_formset': expert_formset})

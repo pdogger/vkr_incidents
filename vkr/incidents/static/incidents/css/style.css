@@ -16,6 +16,7 @@ body {
     background-color: rgb(250, 254, 251);
     color: #19171a;
     overflow: overlay;
+    width: 100%;
 }
 
 .header {
@@ -49,4 +50,15 @@ body {
 
 .empty-incidents {
     min-height: 75vh;
+}
+
+::-webkit-scrollbar {
+    height: .8rem;
+    width: .8rem;
+}
+::-webkit-scrollbar-thumb {
+    background-color: hsl(0, 2%, 47%);
+    border: .2rem solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: .8rem;
 }
