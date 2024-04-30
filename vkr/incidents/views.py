@@ -102,13 +102,14 @@ def incident(request, incident_id):
         return incident_delete(request)
 
 # Несуществующая форма пока что
-def incident_assessment(request):
+def incident_assess(request, incident_id):
+    if request.method == 'GET':
+        return HttpResponse("В разработке")
     if request.method == 'POST':
-        form_inc_assessment = IncidentAssessmentForm(request.POST)
-        if form_inc_assessment.is_valid():
+        form_inc_assess = IncidentAssessForm(request.POST)
+        if form_inc_assess.is_valid():
 
             expert_id = request.user.id
-            incident_id = request.POST['incident_id']
 
             try:
                 incident = Incident.objects.get(id=incident_id)
@@ -122,7 +123,7 @@ def incident_assessment(request):
 
             incident_expert = IncidentExpert.objects.get(incident=incident,
                                                          expert=expert)
-            incident_expert.scores = form_inc_assessment.cleaned_data['scores']
+            incident_expert.scores = form_inc_assess.cleaned_data['scores']
             incident_expert.save()
 
             if check_all_experts_done(incident):
@@ -130,13 +131,13 @@ def incident_assessment(request):
                 incident.results = calculate_incident(get_all_scores(incident))
                 incident.save()
 
-            return HttpResponseRedirect(f"/incident?incident_id={incident_id}")
+            return HttpResponseRedirect(f"/incident/{incident_id}")
 
     else:
-        form_inc_assessment = IncidentAssessmentForm()
+        form_inc_assess = IncidentAssessForm()
 
-    return render(request, "incidents/incident_assessment.html",
-                  {"form_inc_assessment": form_inc_assessment})
+    return render(request, "incidents/incident_assess.html",
+                  {"form_inc_assess": form_inc_assess})
 
 @login_required(login_url='login')
 def examples(request):
