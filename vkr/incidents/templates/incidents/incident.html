@@ -68,7 +68,7 @@
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ forloop.counter }}. {{ basis.name }}</h5>
                   </div>
-                  <p class="mb-1">{{ basis.description }}</p>
+                  <p class="mb-1">{{ basis.description|linebreaks }}</p>
                 </a>
                 {% endfor %}
             </div>
@@ -81,7 +81,7 @@
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ forloop.counter }}. {{ strategy.name }}</h5>
                   </div>
-                  <p class="mb-1">{{ strategy.description }}</p>
+                  <p class="mb-1">{{ strategy.description|linebreaks }}</p>
                 </a>
                 {% endfor %}
             </div>
