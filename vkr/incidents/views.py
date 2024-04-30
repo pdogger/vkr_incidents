@@ -7,8 +7,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert
-from .forms import ExpertFormSet, IncidentCreateForm, IncidentForm, LoginUserForm
+from .models import Incident, Expert, IncidentCritery, IncidentExpert
+from .forms import ExpertFormSet, IncidentForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
@@ -60,14 +60,24 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident.creator = Expert.objects.filter(user=request.user).first()
             incident.status_id = 1
             incident.save()
-            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
-            experts = expert_formset.save(commit=False)
-            experts = filter(lambda x: x.expert.user != incident.creator.user, experts)
-            for num, expert in enumerate(experts):
+
+            criteries = incident_form.cleaned_data['criteries_list']
+            for num, critery in enumerate(criteries):
+                IncidentCritery.objects.create(incident=incident,
+                                               critery=critery,
+                                               critery_number=num + 1)
+
+            IncidentExpert.objects.create(incident=incident,
+                                          expert=incident.creator,
+                                          expert_number=1)
+            experts_related = expert_formset.save(commit=False)
+            for num, expert in enumerate(experts_related):
                 expert.expert_number = num + 2
                 expert.incident = incident
                 expert.save()
+
             return redirect('incidents')
+
     elif request.method == 'GET':
         incident_form = IncidentForm()
         expert_formset = ExpertFormSet()
@@ -82,6 +92,7 @@ def incident_delete(request,incident_id):
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
         return redirect("incidents")
+
 
 @login_required(login_url='login')
 def incident(request, incident_id):
@@ -135,10 +146,12 @@ def incident_assess(request, incident_id):
     return render(request, "incidents/incident_assess.html",
                   {"form_inc_assess": form_inc_assess})
 
+
 @login_required(login_url='login')
 def examples(request):
     if request.method == 'GET':
         return render(request, "incidents/examples.html")
+
 
 @login_required(login_url='login')
 def methods(request):

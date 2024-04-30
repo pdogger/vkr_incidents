@@ -2,14 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
-from .models import Expert, Incident, IncidentExpert
-
-
-class IncidentCreateForm(forms.Form):
-    name = forms.CharField(label="Название инцидента", max_length=100)
-    description = forms.CharField(label="Описание инцидента", widget=forms.Textarea)
-
-    experts = forms.ModelMultipleChoiceField(Expert.objects, widget=forms.CheckboxSelectMultiple)
+from .models import Incident, IncidentCritery, IncidentExpert, Critery
 
 
 class LoginUserForm(AuthenticationForm):
@@ -24,12 +17,18 @@ class LoginUserForm(AuthenticationForm):
 
 
 class IncidentForm(forms.ModelForm):
+    criteries_list = forms.ModelMultipleChoiceField(
+        queryset = Critery.objects.all(),
+        widget = forms.CheckboxSelectMultiple,
+        required = True
+    )
+
     class Meta:
         model = Incident
         fields = ['name', 'description']
 
 
-class ExpertForm(forms.ModelForm):
+class IncidentExpertForm(forms.ModelForm):
     class Meta:
         model = IncidentExpert
         fields = ['expert']
@@ -38,8 +37,8 @@ class ExpertForm(forms.ModelForm):
 ExpertFormSet = forms.inlineformset_factory(
     Incident,
     IncidentExpert,
-    form=ExpertForm,
+    form=IncidentExpertForm,
     extra=1,
-    max_num=7,
+    max_num=6,
     can_delete=False
 )
