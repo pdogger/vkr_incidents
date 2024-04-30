@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Basis, Incident, Expert, IncidentBasis, IncidentExpert, IncidentStrategy, Strategy
+from .models import Incident, Expert, IncidentExpert
 from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -53,8 +53,8 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
     if request.method == 'POST':
         incident_form = IncidentForm(request.POST)
         expert_formset = ExpertFormSet(request.POST)
-        basis_formset = BasisFormSet(request.POST, prefix='incidentbasis')
-        strategy_formset = StrategyFormSet(request.POST, prefix='incidentstrategy')
+        basis_formset = BasisFormSet(request.POST)
+        strategy_formset = StrategyFormSet(request.POST)
 
         if incident_form.is_valid() and expert_formset.is_valid():
             incident = incident_form.save(commit=False)
@@ -64,36 +64,38 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident.save()
 
             criteries = incident_form.cleaned_data['criteries_list']
-            for num, critery in enumerate(criteries):
-                incident.incidentcritery_set.create(critery=critery, critery_number=num + 1)
+            for num, criteria in enumerate(criteries):
+                incident.incidentcriteria_set.create(criteria=criteria, number=num + 1)
 
             IncidentExpert.objects.create(incident=incident,
                                           expert=incident.creator,
-                                          expert_number=1)
+                                          number=1)
             experts_related = expert_formset.save(commit=False)
             experts_related = filter(lambda x: x.expert.user != incident.creator.user,
                                      experts_related)
             for num, expert in enumerate(experts_related):
-                expert.expert_number = num + 2
+                expert.number = num + 2
                 expert.incident = incident
                 expert.save()
 
-            for num, basis_data in enumerate(basis_formset.cleaned_data):
-                basis = Basis.objects.create(**basis_data)
-                IncidentBasis.objects.create(incident=incident, basis=basis, basis_number=num + 1)
+            basises_related = basis_formset.save(commit=False)
+            for num, basis in enumerate(basises_related):
+                basis.number = num + 1
+                basis.incident = incident
+                basis.save()
 
-            for num, strategy_data in enumerate(strategy_formset.cleaned_data):
-                strategy = Strategy.objects.create(**strategy_data)
-                IncidentStrategy.objects.create(incident=incident,
-                                                strategy=strategy,
-                                                strategy_number=num + 1)
+            strategies_related = strategy_formset.save(commit=False)
+            for num, strategy in enumerate(strategies_related):
+                strategy.number = num + 1
+                strategy.incident = incident
+                strategy.save()
 
             return redirect('incidents')
     elif request.method == 'GET':
         incident_form = IncidentForm()
         expert_formset = ExpertFormSet()
-        basis_formset = BasisFormSet(prefix='incidentbasis')
-        strategy_formset = StrategyFormSet(prefix='incidentstrategy')
+        basis_formset = BasisFormSet()
+        strategy_formset = StrategyFormSet()
     return render(request, 'incidents/incident_create.html',
                   {'incident_form': incident_form, 'expert_formset': expert_formset,
                    'basis_formset': basis_formset, 'strategy_formset': strategy_formset})

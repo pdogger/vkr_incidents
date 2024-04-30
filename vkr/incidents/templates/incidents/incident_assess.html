@@ -17,17 +17,17 @@
       </div>
       {% endif %}
 
-      {% if incident.basises.count > 0 and incident.strategies.count > 1 %}
+      {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
       <div>
       <h4>Сравнение стратегий по базисам</h4>
-      {% for basis in incident.basises.all %}
+      {% for basis in incident.basis_set.all %}
       <div name="basis">
       <h4>Базис {{ forloop.counter }}: {{ basis.description }}</h4>
       {% for criteria in incident.criteries.all %}
       <div name="criteria_basis">
       <p>Сравнение по критерию '{{ criteria.description }}' и базису '{{ basis.name }}'</p>
-      {% for x in incident.strategies.count|times %}
-      {% for y in x|add:"1"|times:incident.strategies.count %}
+      {% for x in incident.strategy_set.count|times %}
+      {% for y in x|add:"1"|times:incident.strategy_set.count %}
       <div name="strategy">
         <label for="strategy_score">Стратегия {{x|add:"1"}}</label>
         <input type="text" id="strategy_score" name="strategy_score" value="1" />

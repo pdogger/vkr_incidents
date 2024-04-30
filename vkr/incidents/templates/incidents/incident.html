@@ -76,7 +76,7 @@
         <div class="card-body m-2 mb-1">
             <h5 class="card-title">Базисы</h5>
             <div class="list-group">
-                {% for basis in incident.basises.all %}
+                {% for basis in incident.basis_set.all %}
                 <a class="list-group-item flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ forloop.counter }}. {{ basis.name }}</h5>
@@ -89,7 +89,7 @@
         <div class="card-body m-2 mb-1">
             <h5 class="card-title">Стратегии</h5>
             <div class="list-group">
-                {% for strategy in incident.strategies.all %}
+                {% for strategy in incident.strategy_set.all %}
                 <a class="list-group-item flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ forloop.counter }}. {{ strategy.name }}</h5>
