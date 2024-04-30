@@ -1,5 +1,4 @@
 import datetime
-from django import forms
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -9,7 +8,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 
 from .models import Incident, Expert, IncidentExpert
-from .forms import ExpertForm, IncidentCreateForm, IncidentForm, LoginUserForm
+from .forms import ExpertFormSet, IncidentCreateForm, IncidentForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
@@ -146,21 +145,19 @@ def methods(request):
 
 @login_required(login_url='login')
 def add_incident_experts(request):
-    ExpertFormSet = forms.inlineformset_factory(
-        Incident,
-        IncidentExpert,
-        form=ExpertForm,
-        extra=1,  # Количество пустых форм для добавления
-        can_delete=False  # Позволяет удалять формы (если нужно)
-    )
     if request.method == 'POST':
         incident_form = IncidentForm(request.POST)
         expert_formset = ExpertFormSet(request.POST)
 
         if incident_form.is_valid() and expert_formset.is_valid():
-            incident = incident_form.save()
+            incident = incident_form.save(commit=False)
+            incident.created_at = datetime.datetime.now()
+            incident.creator = Expert.objects.get(user=request.user)
+            incident.status_id = 1
+            incident.save()
             experts = expert_formset.save(commit=False)
-            for expert in experts:
+            for num, expert in enumerate(experts):
+                expert.expert_number = num + 1
                 expert.incident = incident
                 expert.save()
             return redirect('incidents')
