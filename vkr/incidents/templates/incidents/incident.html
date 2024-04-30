@@ -87,13 +87,20 @@
             </div>
         </div>
         <div class="card-body m-2 mb-1">
-          <h5 class="card-title">Ваши оценки</h5>
-          {% if not expert %}
-          <p class="card-text">Вы не участвуете в оценке этого инцидента.</p>
-          {% elif not expert.scores %}
-          <p class="card-text">Вы не оценили этот инцидент.</p>
+          <h5 class="card-title">Оценки экспертов</h5>
+          {% if not experts_with_scores %}
+          <p class="card-text">Ни один эксперт не предоставил своих оценок по инциденту.</p>
           {% else %}
-          <p class="card-text">{{ expert.scores }}</p>
+          <div class="list-group">
+            {% for expert in experts_with_scores %}
+            <a class="list-group-item flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ expert.expert.user.get_full_name }} ({{ expert.expert.user.get_username }}):</h5>
+              </div>
+              <p class="mb-1">{{ expert.scores }}</p>
+            </a>
+            {% endfor %}
+          </div>
           {% endif %}
         </div>
         <div class="card-body m-2 mb-1">
