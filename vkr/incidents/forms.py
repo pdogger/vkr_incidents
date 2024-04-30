@@ -26,12 +26,20 @@ class LoginUserForm(AuthenticationForm):
 class IncidentForm(forms.ModelForm):
     class Meta:
         model = Incident
-        fields = ['name', 'description', 'creator', 'status', 'created_at']
-        widgets = {
-            'created_at': forms.DateTimeInput(attrs={'type': 'datetime-local'})
-        }
+        fields = ['name', 'description']
+
 
 class ExpertForm(forms.ModelForm):
     class Meta:
         model = IncidentExpert
-        fields = ['expert', 'expert_number']
+        fields = ['expert']
+
+
+ExpertFormSet = forms.inlineformset_factory(
+    Incident,
+    IncidentExpert,
+    form=ExpertForm,
+    extra=1,
+    max_num=7,
+    can_delete=False
+)
