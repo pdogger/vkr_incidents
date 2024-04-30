@@ -107,12 +107,12 @@ def incident_assessment(request):
                 raise Http404("Инцидент не существует")
 
             try:
-                Expert.objects.get(id=expert_id)
+                expert = Expert.objects.get(id=expert_id)
             except Expert.DoesNotExist:
                 raise Http404("Эксперт не существует")
 
-            incident_expert = IncidentExpert.objects.get(incident_id=incident_id,
-                                                         expert_id=expert_id)
+            incident_expert = IncidentExpert.objects.get(incident=incident,
+                                                         expert=expert)
             incident_expert.scores = form_inc_assessment.cleaned_data['scores']
             incident_expert.save()
 
