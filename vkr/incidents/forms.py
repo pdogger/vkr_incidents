@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 
-from .models import Basis, Incident, IncidentBasis, IncidentCritery, IncidentExpert, Critery, Strategy
+from .models import Incident, Basis, IncidentExpert, Criteria, Strategy
 
 
 class LoginUserForm(AuthenticationForm):
@@ -18,9 +18,10 @@ class LoginUserForm(AuthenticationForm):
 
 class IncidentForm(forms.ModelForm):
     criteries_list = forms.ModelMultipleChoiceField(
-        queryset = Critery.objects.all(),
-        widget = forms.CheckboxSelectMultiple,
-        required = True
+        queryset=Criteria.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+        label="Критерии"
     )
 
     class Meta:
@@ -37,7 +38,7 @@ class IncidentExpertForm(forms.ModelForm):
 ExpertFormSet = forms.inlineformset_factory(
     Incident,
     IncidentExpert,
-    form=IncidentExpertForm,
+    fields=['expert'],
     extra=1,
     max_num=6,
     can_delete=False,
@@ -45,14 +46,10 @@ ExpertFormSet = forms.inlineformset_factory(
 )
 
 
-class BasisForm(forms.ModelForm):
-    class Meta:
-        model = Basis
-        fields = ['name', 'description']
-
-
-BasisFormSet = forms.formset_factory(
-    BasisForm,
+BasisFormSet = forms.inlineformset_factory(
+    Incident,
+    Basis,
+    fields=['name', 'description'],
     extra=0,
     can_delete=False,
     min_num=1,
@@ -62,14 +59,10 @@ BasisFormSet = forms.formset_factory(
 )
 
 
-class StrategyForm(forms.ModelForm):
-    class Meta:
-        model = Strategy
-        fields = ['name', 'description']
-
-
-StrategyFormSet = forms.formset_factory(
-    StrategyForm,
+StrategyFormSet = forms.inlineformset_factory(
+    Incident,
+    Strategy,
+    fields=['name', 'description'],
     extra=0,
     can_delete=False,
     min_num=2,

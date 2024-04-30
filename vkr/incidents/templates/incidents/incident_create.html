@@ -21,26 +21,26 @@
                 var form_idx = $('.basis-form').length;
                 var form = $('#empty-basis-form').html().replace(/__prefix__/g, form_idx);
                 $('.basis-formset').append('<div class="basis-form">' + form + '</div>');
-                $('#id_incidentbasis-TOTAL_FORMS').val(form_idx + 1);
+                $('#id_basis_set-TOTAL_FORMS').val(form_idx + 1);
             });
 
             $('.remove-basis').click(function() {
                 $('.basis-form').last().remove();
                 var forms = $('.basis-form').length;
-                $('#id_incidentbasis-TOTAL_FORMS').val(forms);
+                $('#id_basis_set-TOTAL_FORMS').val(forms);
             });
 
             $('#add-strategy').click(function() {
                 var form_idx = $('.strategy-form').length;
                 var form = $('#empty-strategy-form').html().replace(/__prefix__/g, form_idx);
                 $('.strategy-formset').append('<div class="strategy-form">' + form + '</div>');
-                $('#id_incidentstrategy-TOTAL_FORMS').val(form_idx + 1);
+                $('#id_strategy_set-TOTAL_FORMS').val(form_idx + 1);
             });
 
             $('.remove-strategy').click(function() {
                 $('.strategy-form').last().remove();
                 var forms = $('.strategy-form').length;
-                $('#id_incidentstrategy-TOTAL_FORMS').val(forms);
+                $('#id_strategy_set-TOTAL_FORMS').val(forms);
             });
         });
     </script>

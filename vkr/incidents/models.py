@@ -2,19 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Basis(models.Model):
-    name = models.CharField("Название", max_length=100)
-    description = models.TextField("Описание")
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        verbose_name = "Базис"
-        verbose_name_plural = "Базисы"
-
-
-class Critery(models.Model):
+class Criteria(models.Model):
     description = models.CharField("Описание", max_length=200)
 
     def __str__(self) -> str:
@@ -23,18 +11,6 @@ class Critery(models.Model):
     class Meta:
         verbose_name = "Критерий ранжирования"
         verbose_name_plural = "Критерии ранжирования"
-
-
-class Strategy(models.Model):
-    name = models.CharField("Название", max_length=100)
-    description = models.TextField("Описание")
-
-    def __str__(self) -> str:
-        return self.name
-
-    class Meta:
-        verbose_name = "Стратегия"
-        verbose_name_plural = "Стратегии"
 
 
 class Expert(models.Model):
@@ -69,9 +45,7 @@ class Incident(models.Model):
                                 related_name="authored_incidents")
     status = models.ForeignKey(Status, verbose_name="Статус", on_delete=models.CASCADE)
 
-    basises = models.ManyToManyField(Basis, through="IncidentBasis")
-    criteries = models.ManyToManyField(Critery, through="IncidentCritery")
-    strategies = models.ManyToManyField(Strategy, through="IncidentStrategy")
+    criteries = models.ManyToManyField(Criteria, through="IncidentCriteria")
     experts = models.ManyToManyField(Expert, through="IncidentExpert")
 
     def __str__(self) -> str:
@@ -82,43 +56,50 @@ class Incident(models.Model):
         verbose_name_plural = "Инциденты"
 
 
-class IncidentBasis(models.Model):
+class Basis(models.Model):
     incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
-    basis = models.ForeignKey(Basis, verbose_name="Базис", on_delete=models.CASCADE)
-    basis_number = models.PositiveSmallIntegerField("Номер")
+
+    name = models.CharField("Название", max_length=100)
+    description = models.TextField("Описание")
+    number = models.PositiveSmallIntegerField("Номер")
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name = "Базис инцидента"
         verbose_name_plural = "Базисы инцидента"
-        unique_together = ('incident', 'basis',)
+        unique_together = ('incident', 'name',)
 
 
-class IncidentCritery(models.Model):
+class Strategy(models.Model):
     incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
-    critery = models.ForeignKey(Critery, verbose_name="Критерий", on_delete=models.CASCADE)
-    critery_number = models.PositiveSmallIntegerField("Номер")
 
-    class Meta:
-        verbose_name = "Критерий ранжирования инцидента"
-        verbose_name_plural = "Критерии ранжирования инцидента"
-        unique_together = ('incident', 'critery',)
-
-
-class IncidentStrategy(models.Model):
-    incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
-    strategy = models.ForeignKey(Strategy, verbose_name="Стратегия", on_delete=models.CASCADE)
-    strategy_number = models.PositiveSmallIntegerField("Номер")
+    name = models.CharField("Название", max_length=100)
+    description = models.TextField("Описание")
+    number = models.PositiveSmallIntegerField("Номер")
 
     class Meta:
         verbose_name = "Стратегия устранения инцидента"
         verbose_name_plural = "Стратегии устранения инцидента"
-        unique_together = ('incident', 'strategy',)
+        unique_together = ('incident', 'name',)
+
+
+class IncidentCriteria(models.Model):
+    incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
+    criteria = models.ForeignKey(Criteria, verbose_name="Критерий", on_delete=models.CASCADE)
+    number = models.PositiveSmallIntegerField("Номер")
+
+    class Meta:
+        verbose_name = "Критерий ранжирования инцидента"
+        verbose_name_plural = "Критерии ранжирования инцидента"
+        unique_together = ('incident', 'criteria',)
 
 
 class IncidentExpert(models.Model):
     incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
     expert = models.ForeignKey(Expert, verbose_name="Эксперт", on_delete=models.CASCADE)
-    expert_number = models.PositiveSmallIntegerField("Номер")
+    number = models.PositiveSmallIntegerField("Номер")
     scores = models.JSONField("Оценки", null=True, blank=True)
 
     class Meta:

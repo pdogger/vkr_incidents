@@ -2,25 +2,23 @@ from django.contrib import admin
 
 from .models import (
     Basis,
-    Critery,
+    Criteria,
     Expert,
     Incident,
-    IncidentBasis,
-    IncidentCritery,
+    IncidentCriteria,
     IncidentExpert,
-    IncidentStrategy,
     Status,
     Strategy
 )
 
 
 class BasisInline(admin.TabularInline):
-    model = IncidentBasis
+    model = Basis
     extra = 1
 
 
-class CriteryInline(admin.TabularInline):
-    model = IncidentCritery
+class CriteriaInline(admin.TabularInline):
+    model = IncidentCriteria
     extra = 1
 
 
@@ -30,23 +28,19 @@ class ExpertInline(admin.TabularInline):
 
 
 class StrategyInline(admin.TabularInline):
-    model = IncidentStrategy
+    model = Strategy
     extra = 1
 
 
 class IncidentAdmin(admin.ModelAdmin):
-    inlines = [BasisInline, CriteryInline, ExpertInline, StrategyInline]
+    inlines = [BasisInline, CriteriaInline, ExpertInline, StrategyInline]
 
 
 admin.site.register(Basis)
-admin.site.register(Critery)
+admin.site.register(IncidentCriteria)
+admin.site.register(IncidentExpert)
+admin.site.register(Strategy)
+admin.site.register(Criteria)
 admin.site.register(Expert)
 admin.site.register(Incident, IncidentAdmin)
 admin.site.register(Status)
-admin.site.register(Strategy)
-
-
-admin.site.register(IncidentBasis)
-admin.site.register(IncidentCritery)
-admin.site.register(IncidentExpert)
-admin.site.register(IncidentStrategy)
