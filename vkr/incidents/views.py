@@ -69,6 +69,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                                           expert=incident.creator,
                                           expert_number=1)
             experts_related = expert_formset.save(commit=False)
+            experts_related = filter(lambda x: x.expert.user != incident.creator.user, experts_related)
             for num, expert in enumerate(experts_related):
                 expert.expert_number = num + 2
                 expert.incident = incident
@@ -82,14 +83,14 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
     return render(request, 'incidents/incident_create.html',
                   {'incident_form': incident_form, 'expert_formset': expert_formset})
 
-
-def incident_delete(request) -> HttpResponse:
-    incident_id = request.DELETE['incident_id']
-    try:
-        Incident.objects.get(id=incident_id).delete()
-    except Incident.DoesNotExist:
-        raise Http404("Инцидент не существует")
-    return render(request, "incidents/incident_delete.html")
+@login_required(login_url='login')
+def incident_delete(request,incident_id):
+    if request.method == 'POST':
+        try:
+            Incident.objects.get(id=incident_id).delete()
+        except Incident.DoesNotExist:
+            raise Http404("Инцидент не существует")
+        return redirect("incidents")
 
 
 @login_required(login_url='login')
@@ -100,14 +101,11 @@ def incident(request, incident_id):
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
 
+
         experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id, scores__isnull = False)
 
         return render(request, "incidents/incident.html", {
             'incident': incident, 'experts_with_scores': experts_with_scores})
-
-    if request.method == 'DELETE':
-        return incident_delete(request)
-
 
 # Несуществующая форма пока что
 def incident_assess(request, incident_id):
