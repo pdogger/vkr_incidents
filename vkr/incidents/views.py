@@ -83,14 +83,11 @@ def incident(request, incident_id):
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
 
-        try:
-            expert = IncidentExpert.objects.get(incident_id=incident_id, expert_id=request.user.id)
-        except IncidentExpert.DoesNotExist:
-            return render(request, "incidents/incident.html", {
-            'incident': incident, 'expert': None})
+        experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id, scores__isnull = False)
 
         return render(request, "incidents/incident.html", {
-            'incident': incident, 'expert': expert})
+            'incident': incident, 'experts_with_scores': experts_with_scores})
+
     if request.method == 'DELETE':
         return incident_delete(request)
 
@@ -109,12 +106,12 @@ def incident_assessment(request):
                 raise Http404("Инцидент не существует")
 
             try:
-                Expert.objects.get(id=expert_id)
+                expert = Expert.objects.get(id=expert_id)
             except Expert.DoesNotExist:
                 raise Http404("Эксперт не существует")
 
-            incident_expert = IncidentExpert.objects.get(incident_id=incident_id,
-                                                         expert_id=expert_id)
+            incident_expert = IncidentExpert.objects.get(incident=incident,
+                                                         expert=expert)
             incident_expert.scores = form_inc_assessment.cleaned_data['scores']
             incident_expert.save()
 
@@ -154,10 +151,10 @@ def add_incident_experts(request):
             incident.creator = Expert.objects.filter(user=request.user).first()
             incident.status_id = 1
             incident.save()
-
+            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
             experts = expert_formset.save(commit=False)
             for num, expert in enumerate(experts):
-                expert.expert_number = num + 1
+                expert.expert_number = num + 2
                 expert.incident = incident
                 expert.save()
             return redirect('incidents')
