@@ -1,29 +1,81 @@
+{% load utiltags %}
 <html>
 <body>
-  <form id="userinfo">
+  <form id="assessment">
+      {% if incident.criteries.count > 1 %}
       <div>
-        <label for="username">Enter your name:</label>
-        <input type="text" id="username" name="username" value="Dominic" />
+      <h4>Сравнение критериев</h4>
+      {% for x in incident.criteries.count|times %}
+      {% for y in x|add:"1"|times:incident.criteries.count %}
+      <div name="criteria">
+        <label for="criteria_score">Критерий {{x|add:"1"}}</label>
+        <input type="text" id="criteria_score" name="criteria_score" value="1" />
+        <label for="criteria_score">Критерий {{y|add:"1"}}</label>
       </div>
-    
+      {% endfor %}
+      {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if incident.basises.count > 0 and incident.strategies.count > 1 %}
       <div>
-        <label for="surname">Enter your surname:</label>
-        <input type="text" id="surname" name="surname" value="Test" />
+      <h4>Сравнение стратегий по базисам</h4>
+      {% for basis in incident.basises.all %}
+      <div name="basis">
+      <h4>Базис {{ forloop.counter }}: {{ basis.description }}</h4>
+      {% for criteria in incident.criteries.all %}
+      <div name="criteria_basis">
+      <p>Сравнение по критерию '{{ criteria.description }}' и базису '{{ basis.name }}'</p>
+      {% for x in incident.strategies.count|times %}
+      {% for y in x|add:"1"|times:incident.strategies.count %}
+      <div name="strategy">
+        <label for="strategy_score">Стратегия {{x|add:"1"}}</label>
+        <input type="text" id="strategy_score" name="strategy_score" value="1" />
+        <label for="strategy_score">Стратегия {{y|add:"1"}}</label>
       </div>
+      {% endfor %}
+      {% endfor %}
+      </div>
+      {% endfor %}
+      </div>
+      {% endfor %}
+      {% endif %}
+
       {% csrf_token %}
       <input type="submit" value="Submit" />
       <a href="{% url 'incident' incident.id %}">Перейти к инциденту</a>
   </form>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
   <script>
-    const form = document.querySelector("#userinfo");
-
     async function sendData() {
-      // Associate the FormData object with the form element
-      const formData = new FormData(form);
+      var values = {
+        "criteria_score": [],
+        "basises": []
+      };
+
+      $('#assessment').find('div[name="criteria"]').each(function() {
+        var value = $(this).find('input[name="criteria_score"]').val();
+        values["criteria_score"].push(Number(value));
+      });
+
+      $('#assessment').find('div[name="basis"]').each(function() {
+        var basis = [];
+        $(this).find('div[name="criteria_basis"]').each(function() {
+          var strategy = [];
+          $(this).find('div[name="strategy"]').each(function() {
+            var value = $(this).find('input[name="strategy_score"]').val();
+            strategy.push(Number(value));
+          });
+          basis.push(strategy);
+        });
+        values["basises"].push(basis);
+      });
 
       const response = await fetch("/incident/assess/{{ incident.id }}", {
           method: "POST",
-          body: formData,
+          body: JSON.stringify(values),
+          headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+          mode: 'same-origin'
         });
     }
 

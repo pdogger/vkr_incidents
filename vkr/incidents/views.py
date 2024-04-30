@@ -126,7 +126,7 @@ def incident(request, incident_id):
 @login_required(login_url='login')
 def incident_assess(request, incident_id):
     if request.method == 'POST':
-        print(request.POST["username"])
+        print(request.body)
         # expert_id = request.user.id
 
         # try:
