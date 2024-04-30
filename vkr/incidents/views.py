@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from .models import Incident, Expert, IncidentExpert
-from .forms import ExpertFormSet, IncidentCreateForm, IncidentForm, LoginUserForm
+from .forms import ExpertFormSet, IncidentForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
@@ -60,7 +60,10 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident.creator = Expert.objects.filter(user=request.user).first()
             incident.status_id = 1
             incident.save()
-            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
+
+            IncidentExpert.objects.create(incident=incident,
+                                          expert=incident.creator,
+                                          expert_number=1)
             experts = expert_formset.save(commit=False)
             for num, expert in enumerate(experts):
                 expert.expert_number = num + 2
