@@ -63,9 +63,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
 
             criteries = incident_form.cleaned_data['criteries_list']
             for num, critery in enumerate(criteries):
-                IncidentCritery.objects.create(incident=incident,
-                                               critery=critery,
-                                               critery_number=num + 1)
+                incident.incidentcritery_set.create(critery=critery, critery_number=num + 1)
 
             IncidentExpert.objects.create(incident=incident,
                                           expert=incident.creator,
