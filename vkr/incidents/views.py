@@ -84,14 +84,11 @@ def incident(request, incident_id):
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
         
-        try:
-            expert = IncidentExpert.objects.get(incident_id=incident_id, expert_id=request.user.id)
-        except IncidentExpert.DoesNotExist:
-            return render(request, "incidents/incident.html", {
-            'incident': incident, 'expert': None})
+        experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id, scores__isnull = False)
         
         return render(request, "incidents/incident.html", {
-            'incident': incident, 'expert': expert})
+            'incident': incident, 'experts_with_scores': experts_with_scores})
+    
     if request.method == 'DELETE':
         return incident_delete(request)
 
