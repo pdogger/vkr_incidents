@@ -152,9 +152,10 @@ def add_incident_experts(request):
             incident.creator = Expert.objects.get(user=request.user)
             incident.status_id = 1
             incident.save()
+            IncidentExpert.objects.create(incident=incident, expert=incident.creator, expert_number=1)
             experts = expert_formset.save(commit=False)
             for num, expert in enumerate(experts):
-                expert.expert_number = num + 1
+                expert.expert_number = num + 2
                 expert.incident = incident
                 expert.save()
             return redirect('incidents')
