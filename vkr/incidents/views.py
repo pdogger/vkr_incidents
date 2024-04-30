@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentCritery, IncidentExpert
+from .models import Incident, Expert, IncidentExpert
 from .forms import ExpertFormSet, IncidentForm, LoginUserForm
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -69,19 +69,20 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                                           expert=incident.creator,
                                           expert_number=1)
             experts_related = expert_formset.save(commit=False)
-            experts_related = filter(lambda x: x.expert.user != incident.creator.user, experts_related)
+            experts_related = filter(lambda x: x.expert.user != incident.creator.user,
+                                     experts_related)
             for num, expert in enumerate(experts_related):
                 expert.expert_number = num + 2
                 expert.incident = incident
                 expert.save()
 
             return redirect('incidents')
-
     elif request.method == 'GET':
         incident_form = IncidentForm()
         expert_formset = ExpertFormSet()
     return render(request, 'incidents/incident_create.html',
                   {'incident_form': incident_form, 'expert_formset': expert_formset})
+
 
 @login_required(login_url='login')
 def incident_delete(request,incident_id):
@@ -101,11 +102,12 @@ def incident(request, incident_id):
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
 
-
-        experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id, scores__isnull = False)
+        experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id,
+                                                            scores__isnull=False)
 
         return render(request, "incidents/incident.html", {
             'incident': incident, 'experts_with_scores': experts_with_scores})
+
 
 # Несуществующая форма пока что
 def incident_assess(request, incident_id):
