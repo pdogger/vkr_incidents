@@ -71,6 +71,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                                           expert=incident.creator,
                                           expert_number=1)
             experts_related = expert_formset.save(commit=False)
+            experts_related = filter(lambda x: x.expert.user != incident.creator.user, experts_related)
             for num, expert in enumerate(experts_related):
                 expert.expert_number = num + 2
                 expert.incident = incident
