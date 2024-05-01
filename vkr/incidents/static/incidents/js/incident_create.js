@@ -29,7 +29,7 @@ $(document).ready(function() {
         }
 
         $('#id_incidentexpert_set-TOTAL_FORMS').val(form_idx);
-        if(form_idx + 1 != 6) {$('#add-expert').show();}
+        if(form_idx < 6) {$('#add-expert').show();}
     });
 
     $('#add-basis').click(function() {
