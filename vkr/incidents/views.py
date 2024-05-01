@@ -50,13 +50,19 @@ def incidents_list(request) -> HttpResponse:
 
 @login_required(login_url='login')
 def incident_create(request) -> HttpResponseRedirect | HttpResponse:
-    if request.method == 'POST':
+    if request.method == 'GET':
+        incident_form = IncidentForm()
+        expert_formset = ExpertFormSet()
+        basis_formset = BasisFormSet()
+        strategy_formset = StrategyFormSet()
+    elif request.method == 'POST':
         incident_form = IncidentForm(request.POST)
         expert_formset = ExpertFormSet(request.POST)
         basis_formset = BasisFormSet(request.POST)
         strategy_formset = StrategyFormSet(request.POST)
 
-        if incident_form.is_valid() and expert_formset.is_valid():
+        if all([incident_form.is_valid(), expert_formset.is_valid(),
+                basis_formset.is_valid(), strategy_formset.is_valid()]):
             incident = incident_form.save(commit=False)
             incident.created_at = timezone.now()
             incident.creator = Expert.objects.filter(user=request.user).first()
@@ -91,11 +97,6 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                 strategy.save()
 
             return redirect('incidents')
-    elif request.method == 'GET':
-        incident_form = IncidentForm()
-        expert_formset = ExpertFormSet()
-        basis_formset = BasisFormSet()
-        strategy_formset = StrategyFormSet()
     return render(request, 'incidents/incident_create.html',
                   {'incident_form': incident_form, 'expert_formset': expert_formset,
                    'basis_formset': basis_formset, 'strategy_formset': strategy_formset})

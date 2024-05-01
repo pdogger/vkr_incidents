@@ -19,30 +19,27 @@ class LoginUserForm(AuthenticationForm):
 class IncidentForm(forms.ModelForm):
     criteries_list = forms.ModelMultipleChoiceField(
         queryset=Criteria.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'mt-1'}),
         required=True,
-        label="Критерии"
+        label="Критерии",
     )
 
     class Meta:
         model = Incident
         fields = ['name', 'description']
-
-
-class IncidentExpertForm(forms.ModelForm):
-    class Meta:
-        model = IncidentExpert
-        fields = ['expert']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control mt-1'}),
+            'description': forms.Textarea(attrs={'class': 'form-control mt-1'})
+        }
 
 
 ExpertFormSet = forms.inlineformset_factory(
     Incident,
     IncidentExpert,
     fields=['expert'],
+    widgets = {'expert': forms.Select(attrs={'class': 'form-select-sm'})},
     extra=1,
-    max_num=6,
-    can_delete=False,
-    validate_max=True
+    can_delete=False
 )
 
 
