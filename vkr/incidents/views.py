@@ -1,3 +1,4 @@
+import json
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert
+from .models import Incident, Expert, IncidentExpert, Status
 from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
@@ -119,38 +120,45 @@ def incident(request, incident_id):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
+        
+        try:
+            expert = Expert.objects.get(user=request.user)
+        except Expert.DoesNotExist:
+            raise Http404("Эксперт не существует")
 
-        experts_with_scores = IncidentExpert.objects.filter(incident_id=incident_id,
+        experts_with_scores = IncidentExpert.objects.filter(incident=incident,
                                                             scores__isnull=False)
+        
+        incident_expert = IncidentExpert.objects.get(incident=incident,
+                                                      expert=expert)
 
         return render(request, "incidents/incident.html", {
-            'incident': incident, 'experts_with_scores': experts_with_scores})
+            'incident': incident,
+            'incident_expert': incident_expert,
+            'experts_with_scores': experts_with_scores})
 
 @login_required(login_url='login')
 def incident_assess(request, incident_id):
     if request.method == 'POST':
-        print(request.body)
-        # expert_id = request.user.id
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            raise Http404("Инцидент не существует")
 
-        # try:
-        #     incident = Incident.objects.get(id=incident_id)
-        # except Incident.DoesNotExist:
-        #     raise Http404("Инцидент не существует")
+        try:
+            expert = Expert.objects.get(user=request.user)
+        except Expert.DoesNotExist:
+            raise Http404("Эксперт не существует")
 
-        # try:
-        #     expert = Expert.objects.get(id=expert_id)
-        # except Expert.DoesNotExist:
-        #     raise Http404("Эксперт не существует")
+        incident_expert = IncidentExpert.objects.get(incident=incident,
+                                                        expert=expert)
+        incident_expert.scores = json.loads(request.body)
+        incident_expert.save()
 
-        # incident_expert = IncidentExpert.objects.get(incident=incident,
-        #                                                 expert=expert)
-        # incident_expert.scores = form_inc_assess.cleaned_data['scores']
-        # incident_expert.save()
-
-        # if check_all_experts_done(incident):
-        #     incident.status = "Оценен"
-        #     incident.results = calculate_incident(get_all_scores(incident))
-        #     incident.save()
+        if check_all_experts_done(incident):
+            incident.status = Status.objects.get(name="Оценен")
+            incident.results = calculate_incident(get_all_scores(incident))
+            incident.save()
 
         return HttpResponse(status=200)
 
