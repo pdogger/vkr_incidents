@@ -8,9 +8,9 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert, IncidentCriteria, Strategy
+from .models import Incident, Expert, IncidentExpert, Status
 from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
-from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores, prepare_scores
+from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 
 
 def signin(request):
@@ -155,7 +155,7 @@ def incident_assess(request, incident_id):
         incident_expert.save()
 
         if check_all_experts_done(incident):
-            incident.status.name = "Оценен"
+            incident.status = Status.objects.get(name="Оценен")
             incident.results = calculate_incident(get_all_scores(incident))
             incident.save()
 
