@@ -1,9 +1,22 @@
-from methods import AHPProcessor, RankingProcessor, PayoffMatrixProcessor
+from methods.AHPProcessor import AHPProcessor
+from methods.RankingProcessor import RankingProcessor
+from methods.PayoffMatrixProcessor import PayoffMatrixProcessor
 import numpy as np
+from pprint import pprint
 
-from incidents.models import Incident, IncidentExpert
+from incidents.models import Incident, IncidentExpert, IncidentCriteria, Strategy
 
+def make_matrix(scores: list, num: int) -> np.array:
+    matrix = np.ones((num, num))
+    j = 0
+    for i in range(num-1):
+        for y in range(i,num-1):
+            matrix[i][y+1] = scores[j]
+            matrix[y+1][i] = 1/scores[j]
+            j+=1
+    return matrix
 
+    
 def get_ahp_values(matrices: dict) -> dict:
     result = dict()
     for key in matrices["S"].keys():
@@ -37,11 +50,30 @@ def check_all_experts_done(incident: Incident) -> bool:
             return False
     return True
 
+def prepare_scores(scores: dict, criteria_count: int, strategy_count: int) -> dict:
+    result = {}
+
+    if scores["criteria_score"] != None:
+        c_matrix = make_matrix(scores["criteria_score"], criteria_count)
+        result["C"] = c_matrix
+
+    result["S"] = {}
+
+    for i in range(len(scores["basises"])):
+        basis = []
+        for criteria in scores["basises"][i]:
+            basis.append(make_matrix(criteria, strategy_count))
+        result["S"]["B" + str(i+1)] = basis
+    
+    return result
+
 
 def get_all_scores(incident: Incident) -> list:
     scores = []
 
-    # TODO упорядочить по номеру эксперта
-    for e in incident.experts.all():
-        scores.append(IncidentExpert.objects.get(incident_id=incident.id, expert_id=e.id).scores)
+    for expert in IncidentExpert.objects.filter(incident=incident).all().order_by('number'):
+        expert_scores = prepare_scores(expert.scores,
+                                       IncidentCriteria.objects.filter(incident=incident).count(),
+                                       Strategy.objects.filter(incident=incident).count())
+        scores.append(expert_scores)
     return scores
