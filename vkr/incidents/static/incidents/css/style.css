@@ -58,3 +58,11 @@ body {
     background-clip: padding-box;
     border-radius: .8rem;
 }
+
+.btn-create-icon {
+    transition: transform .6s ease;
+}
+
+.btn-create-icon:hover {
+    transform: scale(1.05, 1.05) rotate(90deg);
+}

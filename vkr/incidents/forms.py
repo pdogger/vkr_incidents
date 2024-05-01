@@ -38,7 +38,7 @@ ExpertFormSet = forms.inlineformset_factory(
     IncidentExpert,
     fields=['expert'],
     widgets = {'expert': forms.Select(attrs={'class': 'form-select-sm'})},
-    extra=1,
+    extra=0,
     can_delete=False
 )
 
