@@ -66,7 +66,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                 basis_formset.is_valid(), strategy_formset.is_valid()]):
             incident = incident_form.save(commit=False)
             incident.created_at = timezone.now()
-            incident.creator = Expert.objects.filter(user=request.user).first()
+            incident.creator = Expert.objects.get(user=request.user)
             incident.status_id = 1
             incident.save()
 
@@ -97,7 +97,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
                 strategy.incident = incident
                 strategy.save()
 
-            return redirect('incidents')
+            return redirect('incident', incident_id=incident.id)
     return render(request, 'incidents/incident_create.html',
                   {'incident_form': incident_form, 'expert_formset': expert_formset,
                    'basis_formset': basis_formset, 'strategy_formset': strategy_formset})
