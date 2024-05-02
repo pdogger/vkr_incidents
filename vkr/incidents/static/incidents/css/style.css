@@ -66,3 +66,7 @@ body {
 .btn-create-icon:hover {
     transform: scale(1.05, 1.05) rotate(90deg);
 }
+
+.btn-add {
+    background: #47a76a;
+}

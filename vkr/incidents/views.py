@@ -120,7 +120,7 @@ def incident(request, incident_id):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
-        
+
         try:
             expert = Expert.objects.get(user=request.user)
         except Expert.DoesNotExist:
@@ -128,7 +128,7 @@ def incident(request, incident_id):
 
         experts_with_scores = IncidentExpert.objects.filter(incident=incident,
                                                             scores__isnull=False)
-        
+
         incident_expert = IncidentExpert.objects.get(incident=incident,
                                                       expert=expert)
 
