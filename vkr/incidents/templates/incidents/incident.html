@@ -27,7 +27,6 @@
     </nav>
 </header>
 {% endblock %}
-
 {% block content %}
 <div class="cards d-flex p-2 flex-column align-items-center">
     <div class="col-lg-6 col-xxl-5 card mb-3">
@@ -117,9 +116,46 @@
           {% if not incident.results %}
           <p class="card-text">Ранжирование стратегий по инциденту еще не расчитано.</p>
           {% else %}
-          <p class="card-text">{{ incident.results }}</p>
-          {% endif %}
+          <form>
+            <select id="dropdowncoeff">
+              <option value="">Выберите критерий ранжирования</option>
+              <option value="Q_vald">Критерий Вальда</option>
+              <option value="Q_lapl">Критерий Лапласа</option>
+              <option value="Q_sav">Критерий Севиджа</option>
+              <option value="Q_hur">Критерий Гурвица</option>
+              <option value="Q">Обобщенный критерий</option>
+            </select>
+          </form>  
+          {% endif %}          
         </div>
       </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+{{ results|json_script:"results-data" }}
+<script type="text/javascript">
+  const dropdowncoeff = document.querySelector("#dropdowncoeff");
+
+  $("#dropdowncoeff").on( "change", function() {
+    var option_value = dropdowncoeff.options[dropdowncoeff.selectedIndex].value;
+    const results = JSON.parse(document.getElementById('results-data').textContent);
+    var s = '';
+
+    $("#ranging").remove();
+
+
+    Object.keys(results[option_value]).forEach(function(key, index) {
+      s += '<div class="d-flex w-100 justify-content-between">'
+          + '<h5 class="mb-1">' + String(index+1) + '. Стратегия №' + String(key[[key.length - 1]])
+             + ' (' + results[option_value][key]['strategy_name'] +')' + '</h5>'
+          + '</div>'
+          + '<p class="mb-1">' + results[option_value][key]['value'] + '</p>'
+    })
+    $(
+        '<a id="ranging" class="list-group-item flex-column align-items-start mb-1 py-3">'
+        + s
+        + '</a>'
+      ).insertAfter('#dropdowncoeff');
+  });
+</script>
 {% endblock %}

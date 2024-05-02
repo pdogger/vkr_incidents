@@ -11,6 +11,7 @@ from django.utils import timezone
 from .models import Incident, Expert, IncidentExpert, Status
 from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
+from .utils.prepare_data import prepare_results
 
 
 def signin(request):
@@ -131,11 +132,14 @@ def incident(request, incident_id):
 
         incident_expert = IncidentExpert.objects.get(incident=incident,
                                                       expert=expert)
+        
+        results = prepare_results(incident)
 
         return render(request, "incidents/incident.html", {
             'incident': incident,
             'incident_expert': incident_expert,
-            'experts_with_scores': experts_with_scores})
+            'experts_with_scores': experts_with_scores,
+            'results': results})
 
 @login_required(login_url='login')
 def incident_assess(request, incident_id):
