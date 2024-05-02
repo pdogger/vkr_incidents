@@ -1,89 +1,138 @@
+{% extends 'incidents/base.html' %}
+{% load static %}
 {% load utiltags %}
-<html>
-<body>
-  <form id="assessment">
-      {% if incident.criteries.count > 1 %}
-      <div>
-      <h4>Сравнение критериев</h4>
-      {% for x in incident.criteries.count|times %}
-      {% for y in x|add:"1"|times:incident.criteries.count %}
-      <div name="criteria">
-        <label for="criteria_score">Критерий {{x|add:"1"}}</label>
-        <input type="text" id="criteria_score" name="criteria_score" value="1" />
-        <label for="criteria_score">Критерий {{y|add:"1"}}</label>
-      </div>
-      {% endfor %}
-      {% endfor %}
-      </div>
-      {% endif %}
 
-      {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
-      <div>
-      <h4>Сравнение стратегий по базисам</h4>
-      {% for basis in incident.basis_set.all %}
-      <div name="basis">
-      <h4>Базис {{ forloop.counter }}: {{ basis.description }}</h4>
-      {% for criteria in incident.criteries.all %}
-      <div name="criteria_basis">
-      <p>Сравнение по критерию '{{ criteria.description }}' и базису '{{ basis.name }}'</p>
-      {% for x in incident.strategy_set.count|times %}
-      {% for y in x|add:"1"|times:incident.strategy_set.count %}
-      <div name="strategy">
-        <label for="strategy_score">Стратегия {{x|add:"1"}}</label>
-        <input type="text" id="strategy_score" name="strategy_score" value="1" />
-        <label for="strategy_score">Стратегия {{y|add:"1"}}</label>
-      </div>
-      {% endfor %}
-      {% endfor %}
-      </div>
-      {% endfor %}
-      </div>
-      {% endfor %}
-      {% endif %}
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  const form = document.querySelector("#assessment")
+  async function sendData() {
+    var values = {
+      "criteria_score": [],
+      "basises": []
+    };
 
-      {% csrf_token %}
-      <input type="submit" value="Submit" />
-      <a href="{% url 'incident' incident.id %}">Перейти к инциденту</a>
-  </form>
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-  <script>
-    const form = document.querySelector("#assessment")
-    async function sendData() {
-      var values = {
-        "criteria_score": [],
-        "basises": []
-      };
-
-      $('#assessment').find('div[name="criteria"]').each(function() {
-        var value = $(this).find('input[name="criteria_score"]').val();
-        values["criteria_score"].push(Number(value));
-      });
-
-      $('#assessment').find('div[name="basis"]').each(function() {
-        var basis = [];
-        $(this).find('div[name="criteria_basis"]').each(function() {
-          var strategy = [];
-          $(this).find('div[name="strategy"]').each(function() {
-            var value = $(this).find('input[name="strategy_score"]').val();
-            strategy.push(Number(value));
-          });
-          basis.push(strategy);
-        });
-        values["basises"].push(basis);
-      });
-
-      const response = await fetch("/incident/assess/{{ incident.id }}", {
-          method: "POST",
-          body: JSON.stringify(values),
-          headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
-          mode: 'same-origin'
-        });
-    }
-    
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      sendData();
+    $('#assessment').find('div[name="criteria"]').each(function() {
+      var value = $(this).find('input[name="criteria_score"]').val();
+      values["criteria_score"].push(Number(value));
     });
-  </script> 
-</body>
-</html>
+
+    $('#assessment').find('div[name="basis"]').each(function() {
+      var basis = [];
+      $(this).find('div[name="criteria_basis"]').each(function() {
+        var strategy = [];
+        $(this).find('div[name="strategy"]').each(function() {
+          var value = $(this).find('input[name="strategy_score"]').val();
+          strategy.push(Number(value));
+        });
+        basis.push(strategy);
+      });
+      values["basises"].push(basis);
+    });
+
+    const response = await fetch("/incident/assess/{{ incident.id }}", {
+      method: "POST",
+      body: JSON.stringify(values),
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+      mode: 'same-origin'
+    });
+    if (response) {$(location).attr('href', "{% url 'incident' incident.id %}");}
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendData();
+  });
+</script>
+{% endblock %}
+
+{% block header %}
+<header class="header fixed-top shadow-sm d-flex">
+    <nav class="navbar navbar-expand-lg w-100">
+        <a class="navbar-brand" href="#"></a>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav py-1">
+            <li class="nav-item px-5"><a class="nav-link" href="{% url 'incidents' %}">Инциденты</a></li>
+            <li class="nav-item px-5"><a class="nav-link" href="{% url 'methods' %}">Методы</a></li>
+            <li class="nav-item px-5"><a class="nav-link" href="{% url 'examples' %}">Примеры</a></li>
+        </ul>
+        </div>
+        <ul class="navbar-nav position-fixed end-0 me-5 align-items-center">
+            <li class="nav-item px-3 text-end mb-1">
+                <div class="fullname">{{ request.user.get_full_name }}</div>
+                <div class="username">({{ request.user.get_username }})</div>
+            </li>
+            <li class="nav-item px-3">
+                <form action="{% url 'logout' %}" method="POST">
+                    {% csrf_token %}
+                    <button class="logout-btn" type="submit">Выйти</button>
+                </form>
+            </li>
+          </ul>
+    </nav>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="cards d-flex p-2 flex-column align-items-center">
+  <div class="col-lg-6 col-xxl-5 card mb-3">
+    <div class="card-body mx-3 my-1">
+      <form id="assessment">
+        <h3 class="mb-4	text-center">Оценивание инцидента</h3>
+        <div class="card-text py-2 border-bottom">
+          {{ incident.description|linebreaks }}
+        </div>
+          {% if incident.criteries.count > 1 %}
+            <div class="d-flex flex-column gap-2 py-3 border-bottom">
+              <h5 class="m-0 text-center">Сравнение критериев</h5>
+              <div class="d-flex flex-column gap-1 mb-2">
+                {% for criteria in incident.incidentcriteria_set.all %}
+                  <span>Критерий {{ forloop.counter }}: {{ criteria.criteria }}</span>
+                {% endfor %}
+              </div>
+              {% for x in incident.criteries.count|times %}
+                {% for y in x|add:"1"|times:incident.criteries.count %}
+                  <div name="criteria" class="d-flex justify-content-center align-content-center gap-2">
+                    <label for="criteria_score">Критерий {{x|add:"1"}}</label>
+                    <input type="text" id="criteria_score" name="criteria_score" value="1" />
+                    <label for="criteria_score">Критерий {{y|add:"1"}}</label>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
+            <div class="d-flex flex-column gap-2 py-3 border-bottom">
+              <h5 class="m-0 text-center">Сравнение стратегий по базисам</h4>
+              {% for basis in incident.basis_set.all %}
+                <div name="basis">
+                  <div class="fw-bold">Базис {{ forloop.counter }}: {{ basis.name }}</div>
+                  <div>{{ basis.description }}</div>
+                  {% for criteria in incident.criteries.all %}
+                    <div name="criteria_basis" class="py-2">
+                      <p>Сравнение по критерию '{{ criteria.description }}':</p>
+                      {% for x in incident.strategy_set.count|times %}
+                        {% for y in x|add:"1"|times:incident.strategy_set.count %}
+                          <div name="strategy" class="d-flex justify-content-center align-content-center gap-2">
+                            <label for="strategy_score">Стратегия {{x|add:"1"}}</label>
+                            <input type="text" id="strategy_score" name="strategy_score" value="1" />
+                            <label for="strategy_score">Стратегия {{y|add:"1"}}</label>
+                          </div>
+                        {% endfor %}
+                      {% endfor %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% csrf_token %}
+          <input type="submit" value="Завершить оценивание" class="btn btn-success mt-4 mb-1 p-3 w-100 fw-bold"/>
+          {% comment %} <a href="{% url 'incident' incident.id %}">Перейти к инциденту</a> {% endcomment %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
