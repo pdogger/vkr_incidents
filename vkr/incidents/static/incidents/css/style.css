@@ -70,3 +70,13 @@ body {
 .btn-add {
     background: #47a76a;
 }
+
+.accordion-button:not(.collapsed) {
+    background: #47a76a !important;
+    color: white;
+}
+
+.accordion-button:focus, .accordion-button:active {
+    outline: none !important;
+    box-shadow: none;
+}

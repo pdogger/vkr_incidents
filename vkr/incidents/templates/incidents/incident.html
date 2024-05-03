@@ -95,23 +95,41 @@
             </div>
         </div>
         <div class="card-body m-2 mb-1">
-          <h5 class="card-title">Оценки экспертов</h5>
+          <h5 class="card-title">Ценности стратегий на основе оценок экспертов</h5>
           {% if not experts_with_scores %}
-          <p class="card-text">Ни один эксперт не предоставил своих оценок по инциденту.</p>
+            <p class="card-text">Ни один эксперт не предоставил своих оценок по инциденту.</p>
           {% else %}
-          <div class="list-group">
-            {% for expert in experts_with_scores %}
-            <a class="list-group-item flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ expert.expert.user.get_full_name }} ({{ expert.expert.user.get_username }}):</h5>
-              </div>
-              <p class="mb-1">{{ expert.scores }}</p>
-            </a>
-            {% endfor %}
-          </div>
+            <div class="list-group">
+              {% for expert in experts_with_scores %}
+                <div class="list-group-item flex-column align-items-start">
+                  <h5 class="mb-1">{{ expert.expert.user.get_full_name }} ({{ expert.expert.user.get_username }}):</h5>
+                  <div class="accordion my-4" id="accordion{{ forloop.counter }}">
+                    {% for bk, bv in expert.scores.V.items %}
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#e{{ forloop.parentloop.counter }}-collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="e{{ forloop.parentloop.counter }}-collapse{{ forloop.counter }}">
+                            Ценности стратегий по базису {{ forloop.counter }}
+                          </button>
+                        </h2>
+                        <div id="e{{ forloop.parentloop.counter }}-collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordion{{ forloop.parentloop.counter }}">
+                          <div class="accordion-body">
+                            <p>Полученные на основе оценок эксперта ценности стратегий:</p>
+                            <div class="border-start px-3 py-1">
+                              {% for strategy_value in bv %}
+                              <p class="mb-1">Стратегия {{ forloop.counter }}: {{ strategy_value|floatformat:4 }}</p>
+                            {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
           {% endif %}
         </div>
-        <div class="card-body m-2 mb-1">
+        <div class="card-body m-2">
           <h5 class="card-title">Результаты</h5>
           {% if not incident.results %}
           <p class="card-text">Ранжирование стратегий по инциденту еще не расчитано.</p>
@@ -155,7 +173,7 @@
           + '</div>'
     })
     $(
-        '<div id="ranging" class="d-flex flex-column gap-2 py-3">'
+        '<div id="ranging" class="d-flex flex-column gap-2 pt-3">'
         + s
         + '</div>'
       ).insertAfter('#dropdowncoeff');

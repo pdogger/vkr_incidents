@@ -88,57 +88,76 @@
         <div class="card-text py-2 border-bottom">
           {{ incident.description|linebreaks }}
         </div>
-          {% if incident.criteries.count > 1 %}
-            <div class="d-flex flex-column gap-2 py-3 border-bottom">
-              <h5 class="m-0 text-center">Сравнение критериев</h5>
-              <div class="d-flex flex-column gap-1 mb-2">
-                {% for criteria in incident.incidentcriteria_set.all %}
-                  <span>Критерий {{ forloop.counter }}: {{ criteria.criteria }}</span>
-                {% endfor %}
-              </div>
-              {% for x in incident.criteries.count|times %}
-                {% for y in x|add:"1"|times:incident.criteries.count %}
-                  <div name="criteria" class="d-flex justify-content-center gap-2">
-                    <label for="id_choice" class="form-label mt-1">Критерий {{x|add:"1"}}</label>
-                    {% comment %} <input type="text" id="criteria_score" name="criteria_score" value="1" /> {% endcomment %}
-                    {{ assessment_form.choice }}
-                    <label for="id_choice" class="form-label mt-1">Критерий {{y|add:"1"}}</label>
+        <div class="d-flex flex-column gap-2 py-3 border-bottom">
+          <h5 class="m-0 text-center">Список стратегий</h5>
+          <div class="accordion" id="accordionStrategies">
+            {% for strategy in incident.strategy_set.all %}
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
+                    Стратегия {{ forloop.counter }}: {{ strategy.name }}
+                  </button>
+                </h2>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionStrategies">
+                  <div class="accordion-body">
+                    {{ strategy.description|linebreaks }}
                   </div>
-                {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% if incident.criteries.count > 1 %}
+          <div class="d-flex flex-column gap-2 py-3 border-bottom">
+            <h5 class="m-0 text-center">Сравнение критериев</h5>
+            <div class="d-flex flex-column gap-1 mb-2">
+              {% for criteria in incident.incidentcriteria_set.all %}
+                <span>Критерий {{ forloop.counter }}: {{ criteria.criteria }}</span>
               {% endfor %}
             </div>
-          {% endif %}
-
-          {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
-            <div class="d-flex flex-column gap-3 py-3 border-bottom">
-              <h5 class="m-0 text-center">Сравнение стратегий по базисам</h4>
-              {% for basis in incident.basis_set.all %}
-                <div name="basis">
-                  <div class="fw-bold">Базис {{ forloop.counter }}: {{ basis.name }}</div>
-                  <div>{{ basis.description }}</div>
-                  {% for criteria in incident.criteries.all %}
-                    <div name="criteria_basis" class="py-2 d-flex flex-column gap-2">
-                      <div>Сравнение по критерию '{{ criteria.description }}':</div>
-                      {% for x in incident.strategy_set.count|times %}
-                        {% for y in x|add:"1"|times:incident.strategy_set.count %}
-                          <div name="strategy" class="d-flex justify-content-center align-content-center gap-2">
-                            <label for="id_choice" class="form-label mt-1">Стратегия {{x|add:"1"}}</label>
-                            {% comment %} <input type="text" id="strategy_score" name="strategy_score" value="1" /> {% endcomment %}
-                            {{ assessment_form.choice }}
-                            <label for="id_choice" class="form-label mt-1">Стратегия {{y|add:"1"}}</label>
-                          </div>
-                        {% endfor %}
-                      {% endfor %}
-                    </div>
-                  {% endfor %}
+            {% for x in incident.criteries.count|times %}
+              {% for y in x|add:"1"|times:incident.criteries.count %}
+                <div name="criteria" class="d-flex justify-content-center gap-2">
+                  <label for="id_choice" class="form-label mt-1">Критерий {{x|add:"1"}}</label>
+                  {% comment %} <input type="text" id="criteria_score" name="criteria_score" value="1" /> {% endcomment %}
+                  {{ assessment_form.choice }}
+                  <label for="id_choice" class="form-label mt-1">Критерий {{y|add:"1"}}</label>
                 </div>
               {% endfor %}
-            </div>
-          {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
 
-          {% csrf_token %}
-          <input type="submit" value="Завершить оценивание" class="btn btn-success mt-4 mb-1 p-3 w-100 fw-bold"/>
-          {% comment %} <a href="{% url 'incident' incident.id %}">Перейти к инциденту</a> {% endcomment %}
+        {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
+          <div class="d-flex flex-column gap-3 py-3 border-bottom">
+            <h5 class="m-0 text-center">Сравнение стратегий по базисам</h4>
+            {% for basis in incident.basis_set.all %}
+              <div name="basis">
+                <div class="fw-bold">Базис {{ forloop.counter }}: {{ basis.name }}</div>
+                <div>{{ basis.description|linebreaks }}</div>
+                {% for criteria in incident.criteries.all %}
+                  <div name="criteria_basis" class="py-2 d-flex flex-column gap-2">
+                    <div>Сравнение по критерию '{{ criteria.description }}':</div>
+                    {% for x in incident.strategy_set.count|times %}
+                      {% for y in x|add:"1"|times:incident.strategy_set.count %}
+                        <div name="strategy" class="d-flex justify-content-center align-content-center gap-2">
+                          <label for="id_choice" class="form-label mt-1">Стратегия {{x|add:"1"}}</label>
+                          {% comment %} <input type="text" id="strategy_score" name="strategy_score" value="1" /> {% endcomment %}
+                          {{ assessment_form.choice }}
+                          <label for="id_choice" class="form-label mt-1">Стратегия {{y|add:"1"}}</label>
+                        </div>
+                      {% endfor %}
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% csrf_token %}
+        <input type="submit" value="Завершить оценивание" class="btn btn-success mt-4 mb-1 p-3 w-100 fw-bold"/>
+        {% comment %} <a href="{% url 'incident' incident.id %}">Перейти к инциденту</a> {% endcomment %}
       </form>
     </div>
   </div>
