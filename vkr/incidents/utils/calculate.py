@@ -6,7 +6,7 @@ from pprint import pprint
 
 from incidents.models import Incident, IncidentExpert, IncidentCriteria, Strategy
 
-def make_matrix(scores: list, num: int) -> np.array:
+def make_matrix(scores: list, num: int) -> list:
     matrix = np.ones((num, num))
     j = 0
     for i in range(num-1):
@@ -14,9 +14,9 @@ def make_matrix(scores: list, num: int) -> np.array:
             matrix[i][y+1] = scores[j]
             matrix[y+1][i] = 1/scores[j]
             j+=1
-    return matrix
+    return matrix.tolist()
 
-    
+
 def get_ahp_values(matrices: dict) -> dict:
     result = dict()
     for key in matrices["S"].keys():
@@ -58,13 +58,16 @@ def prepare_scores(scores: dict, criteria_count: int, strategy_count: int) -> di
         result["C"] = c_matrix
 
     result["S"] = {}
+    result["V"] = {}
 
     for i in range(len(scores["basises"])):
         basis = []
         for criteria in scores["basises"][i]:
             basis.append(make_matrix(criteria, strategy_count))
         result["S"]["B" + str(i+1)] = basis
-    
+        result['V']["B" + str(i+1)] = AHPProcessor(c_matrix, basis,
+                                                   detailed=False).calculate_values()['V'].tolist()
+
     return result
 
 
@@ -72,8 +75,8 @@ def get_all_scores(incident: Incident) -> list:
     scores = []
 
     for expert in IncidentExpert.objects.filter(incident=incident).all().order_by('number'):
-        expert_scores = prepare_scores(expert.scores,
-                                       IncidentCriteria.objects.filter(incident=incident).count(),
-                                       Strategy.objects.filter(incident=incident).count())
-        scores.append(expert_scores)
+        # expert_scores = prepare_scores(expert.scores,
+        #                                IncidentCriteria.objects.filter(incident=incident).count(),
+        #                                Strategy.objects.filter(incident=incident).count())
+        scores.append(expert.scores)
     return scores

@@ -125,12 +125,14 @@
               <option value="Q_hur">Критерий Гурвица</option>
               <option value="Q">Обобщенный критерий</option>
             </select>
-          </form>  
-          {% endif %}          
+          </form>
+          {% endif %}
         </div>
       </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {{ results|json_script:"results-data" }}
 <script type="text/javascript">
@@ -145,17 +147,17 @@
 
 
     Object.keys(results[option_value]).forEach(function(key, index) {
-      s += '<div class="d-flex w-100 justify-content-between">'
+      s += '<div class="w-100">'
             + '<h5 class="mb-1">' + String(index+1) + '. Стратегия №' + String(key[[key.length - 1]])
-              + ' (' + results[option_value][key]['strategy_name'] +')' + 
+              + ' (' + results[option_value][key]['strategy_name'] +')' +
             '</h5>'
+            + '<p class="mb-1">Итоговая ценность стратегии: ' + results[option_value][key]['value'] + '</p>'
           + '</div>'
-          + '<p class="mb-1">' + results[option_value][key]['value'] + '</p>'
     })
     $(
-        '<a id="ranging" class="list-group-item flex-column align-items-start mb-1 py-3">'
+        '<div id="ranging" class="d-flex flex-column gap-2 py-3">'
         + s
-        + '</a>'
+        + '</div>'
       ).insertAfter('#dropdowncoeff');
   });
 </script>
