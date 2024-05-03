@@ -68,7 +68,7 @@ def incident_create(request) -> HttpResponseRedirect | HttpResponse:
             incident = incident_form.save(commit=False)
             incident.created_at = timezone.now()
             incident.creator = Expert.objects.get(user=request.user)
-            incident.status_id = 1
+            incident.status = Status.objects.get(name="Инициирован")
             incident.save()
 
             criteries = incident_form.cleaned_data['criteries_list']
