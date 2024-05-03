@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from .models import Incident, Expert, IncidentExpert, Status
-from .forms import BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
+from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores
 from .utils.prepare_data import prepare_results
 
@@ -129,10 +129,8 @@ def incident(request, incident_id):
 
         experts_with_scores = IncidentExpert.objects.filter(incident=incident,
                                                             scores__isnull=False)
-
         incident_expert = IncidentExpert.objects.get(incident=incident,
                                                       expert=expert)
-        
         results = prepare_results(incident)
 
         return render(request, "incidents/incident.html", {
@@ -171,8 +169,9 @@ def incident_assess(request, incident_id):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
-        return render(request, "incidents/incident_assess.html",{
-            'incident': incident})
+        assessment_form = AssessmentForm()
+        return render(request, "incidents/incident_assess.html",
+                      {'incident': incident, 'assessment_form': assessment_form})
 
 
 @login_required(login_url='login')

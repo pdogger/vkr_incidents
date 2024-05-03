@@ -16,6 +16,20 @@ class LoginUserForm(AuthenticationForm):
         fields = ['username', 'password']
 
 
+class AssessmentForm(forms.Form):
+    CHOICES = {'1/9': 'Очень сильно уступает (1/9)',
+               '1/7': 'Значительно уступает (1/7)',
+               '1/5': 'Сильно уступает (1/5)',
+               '1/3': 'Умеренно уступает (1/3)',
+               '1': 'Имеет равную ценность (1)',
+               '3': 'Умеренно превосходит (3)',
+               '5': 'Сильно превосходит (5)',
+               '7': 'Значительно превосходит (7)',
+               '9': 'Очень сильно превосходит (9)'}
+    choice = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-select-sm'}),
+                          choices=CHOICES, initial='1')
+
+
 class IncidentForm(forms.ModelForm):
     criteries_list = forms.ModelMultipleChoiceField(
         queryset=Criteria.objects.all(),

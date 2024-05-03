@@ -5,43 +5,49 @@
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  const form = document.querySelector("#assessment")
-  async function sendData() {
-    var values = {
-      "criteria_score": [],
-      "basises": []
-    };
+  $(document).ready(function() {
+    const form = document.querySelector("#assessment")
+    async function sendData() {
+      var values = {
+        "criteria_score": [],
+        "basises": []
+      };
 
-    $('#assessment').find('div[name="criteria"]').each(function() {
-      var value = $(this).find('input[name="criteria_score"]').val();
-      values["criteria_score"].push(Number(value));
-    });
-
-    $('#assessment').find('div[name="basis"]').each(function() {
-      var basis = [];
-      $(this).find('div[name="criteria_basis"]').each(function() {
-        var strategy = [];
-        $(this).find('div[name="strategy"]').each(function() {
-          var value = $(this).find('input[name="strategy_score"]').val();
-          strategy.push(Number(value));
-        });
-        basis.push(strategy);
+      $('#assessment').find('div[name="criteria"]').each(function() {
+        var value = $(this).find('select').val();
+        if (value.split('/').length == 2) {
+          values["criteria_score"].push(Number(value.split('/')[0]) / Number(value.split('/')[1]));
+        } else { values["criteria_score"].push(Number(value)); }
       });
-      values["basises"].push(basis);
-    });
 
-    const response = await fetch("/incident/assess/{{ incident.id }}", {
-      method: "POST",
-      body: JSON.stringify(values),
-      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
-      mode: 'same-origin'
-    });
-    if (response) {$(location).attr('href', "{% url 'incident' incident.id %}");}
-  }
+      $('#assessment').find('div[name="basis"]').each(function() {
+        var basis = [];
+        $(this).find('div[name="criteria_basis"]').each(function() {
+          var strategy = [];
+          $(this).find('div[name="strategy"]').each(function() {
+            var value = $(this).find('select').val();
+            if (value.split('/').length == 2) {
+              strategy.push(Number(value.split('/')[0]) / Number(value.split('/')[1]));
+            } else { strategy.push(Number(value)); }
+          });
+          basis.push(strategy);
+        });
+        values["basises"].push(basis);
+      });
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    sendData();
+      const response = await fetch("/incident/assess/{{ incident.id }}", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+        mode: 'same-origin'
+      });
+      if (response) {$(location).attr('href', "{% url 'incident' incident.id %}");}
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendData();
+    });
   });
 </script>
 {% endblock %}
@@ -92,10 +98,11 @@
               </div>
               {% for x in incident.criteries.count|times %}
                 {% for y in x|add:"1"|times:incident.criteries.count %}
-                  <div name="criteria" class="d-flex justify-content-center align-content-center gap-2">
-                    <label for="criteria_score">Критерий {{x|add:"1"}}</label>
-                    <input type="text" id="criteria_score" name="criteria_score" value="1" />
-                    <label for="criteria_score">Критерий {{y|add:"1"}}</label>
+                  <div name="criteria" class="d-flex justify-content-center gap-2">
+                    <label for="id_choice" class="form-label mt-1">Критерий {{x|add:"1"}}</label>
+                    {% comment %} <input type="text" id="criteria_score" name="criteria_score" value="1" /> {% endcomment %}
+                    {{ assessment_form.choice }}
+                    <label for="id_choice" class="form-label mt-1">Критерий {{y|add:"1"}}</label>
                   </div>
                 {% endfor %}
               {% endfor %}
@@ -103,21 +110,22 @@
           {% endif %}
 
           {% if incident.basis_set.count > 0 and incident.strategy_set.count > 1 %}
-            <div class="d-flex flex-column gap-2 py-3 border-bottom">
+            <div class="d-flex flex-column gap-3 py-3 border-bottom">
               <h5 class="m-0 text-center">Сравнение стратегий по базисам</h4>
               {% for basis in incident.basis_set.all %}
                 <div name="basis">
                   <div class="fw-bold">Базис {{ forloop.counter }}: {{ basis.name }}</div>
                   <div>{{ basis.description }}</div>
                   {% for criteria in incident.criteries.all %}
-                    <div name="criteria_basis" class="py-2">
-                      <p>Сравнение по критерию '{{ criteria.description }}':</p>
+                    <div name="criteria_basis" class="py-2 d-flex flex-column gap-2">
+                      <div>Сравнение по критерию '{{ criteria.description }}':</div>
                       {% for x in incident.strategy_set.count|times %}
                         {% for y in x|add:"1"|times:incident.strategy_set.count %}
                           <div name="strategy" class="d-flex justify-content-center align-content-center gap-2">
-                            <label for="strategy_score">Стратегия {{x|add:"1"}}</label>
-                            <input type="text" id="strategy_score" name="strategy_score" value="1" />
-                            <label for="strategy_score">Стратегия {{y|add:"1"}}</label>
+                            <label for="id_choice" class="form-label mt-1">Стратегия {{x|add:"1"}}</label>
+                            {% comment %} <input type="text" id="strategy_score" name="strategy_score" value="1" /> {% endcomment %}
+                            {{ assessment_form.choice }}
+                            <label for="id_choice" class="form-label mt-1">Стратегия {{y|add:"1"}}</label>
                           </div>
                         {% endfor %}
                       {% endfor %}
