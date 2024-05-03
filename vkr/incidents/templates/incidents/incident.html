@@ -117,7 +117,7 @@
           <p class="card-text">Ранжирование стратегий по инциденту еще не расчитано.</p>
           {% else %}
           <form>
-            <select id="dropdowncoeff">
+            <select class="form-select" id="dropdowncoeff">
               <option value="">Выберите критерий ранжирования</option>
               <option value="Q_vald">Критерий Вальда</option>
               <option value="Q_lapl">Критерий Лапласа</option>
@@ -131,14 +131,14 @@
       </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {{ results|json_script:"results-data" }}
 <script type="text/javascript">
   const dropdowncoeff = document.querySelector("#dropdowncoeff");
+  const results = JSON.parse(document.getElementById('results-data').textContent);
 
   $("#dropdowncoeff").on( "change", function() {
     var option_value = dropdowncoeff.options[dropdowncoeff.selectedIndex].value;
-    const results = JSON.parse(document.getElementById('results-data').textContent);
     var s = '';
 
     $("#ranging").remove();
@@ -146,8 +146,9 @@
 
     Object.keys(results[option_value]).forEach(function(key, index) {
       s += '<div class="d-flex w-100 justify-content-between">'
-          + '<h5 class="mb-1">' + String(index+1) + '. Стратегия №' + String(key[[key.length - 1]])
-             + ' (' + results[option_value][key]['strategy_name'] +')' + '</h5>'
+            + '<h5 class="mb-1">' + String(index+1) + '. Стратегия №' + String(key[[key.length - 1]])
+              + ' (' + results[option_value][key]['strategy_name'] +')' + 
+            '</h5>'
           + '</div>'
           + '<p class="mb-1">' + results[option_value][key]['value'] + '</p>'
     })

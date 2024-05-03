@@ -1,4 +1,4 @@
-from incidents.models import Incident, IncidentExpert, IncidentCriteria, Strategy
+from incidents.models import Strategy
 
 def prepare_results(incident):
     if incident.results == None :
@@ -12,4 +12,5 @@ def prepare_results(incident):
                 'value': incident.results[criteria][key],
                 'strategy_name': Strategy.objects.get(incident=incident, number=key[-1]).name
             }
+            
     return results
