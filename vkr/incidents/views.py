@@ -11,7 +11,7 @@ from django.utils import timezone
 from .models import Incident, Expert, IncidentExpert, Status
 from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores, prepare_scores
-from .utils.prepare_data import prepare_results
+from .utils.prepare_data import prepare_results, prepare_score_matrix
 
 
 def signin(request):
@@ -127,16 +127,21 @@ def incident(request, incident_id):
         except Expert.DoesNotExist:
             raise Http404("Эксперт не существует")
 
-        experts_with_scores = IncidentExpert.objects.filter(incident=incident,
-                                                            scores__isnull=False)
         incident_expert = IncidentExpert.objects.filter(incident=incident,
                                                         expert=expert).first()
         results = prepare_results(incident)
 
+        experts_with_scores = IncidentExpert.objects.filter(incident=incident,
+                                                            scores__isnull=False)
+        scores = []
+        for expert in experts_with_scores:
+            scores.append({"expert": expert, "scores": prepare_score_matrix(expert.scores)})
+
+        print(scores)
         return render(request, "incidents/incident.html", {
             'incident': incident,
             'incident_expert': incident_expert,
-            'experts_with_scores': experts_with_scores,
+            'scores': scores,
             'results': results})
 
 

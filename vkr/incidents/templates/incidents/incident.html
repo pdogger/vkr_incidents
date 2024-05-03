@@ -96,16 +96,44 @@
         </div>
         <div class="card-body m-2 mb-1">
           <h5 class="card-title">Оценки экспертов</h5>
-          {% if not experts_with_scores %}
+          {% if not scores %}
           <p class="card-text">Ни один эксперт не предоставил своих оценок по инциденту.</p>
           {% else %}
           <div class="list-group">
-            {% for expert in experts_with_scores %}
+            {% for expert in scores %}
             <a class="list-group-item flex-column align-items-start">
               <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ expert.expert.user.get_full_name }} ({{ expert.expert.user.get_username }}):</h5>
+                <h5 class="mb-1">{{ expert.expert.expert.user.get_full_name }} ({{ expert.expert.expert.user.get_username }}):</h5>
               </div>
-              <p class="mb-1">{{ expert.scores }}</p>
+              {% if expert.scores.C %}
+              <table>
+                {% for row in expert.scores.C %}
+                    <tr>
+                    {% for cell in row %}
+                        {% if forloop.first or forloop.parentloop.first %} <th> {% else %} <td> {% endif %}
+                            {{ cell }}
+                        {% if forloop.first or forloop.parentloop.first %} </th> {% else %} </td> {% endif %}
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+              </table>
+              {% endif %}
+              {% for basis, value in expert.scores.S.items %}
+              <p class="card-text">Базис {{forloop.counter}}</p>
+              {% for criteria in value %}
+              <table>
+                {% for row in criteria %}
+                    <tr>
+                    {% for cell in row %}
+                        {% if forloop.first or forloop.parentloop.first %} <th> {% else %} <td> {% endif %}
+                            {{ cell }}
+                        {% if forloop.first or forloop.parentloop.first %} </th> {% else %} </td> {% endif %}
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+              </table>
+              {% endfor %}
+              {% endfor %}
             </a>
             {% endfor %}
           </div>
