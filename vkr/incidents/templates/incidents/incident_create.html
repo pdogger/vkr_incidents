@@ -64,7 +64,7 @@
                         {{ expert_formset.empty_form.expert }}
                     </div>
 
-                    {% if expert_formset.errors %}
+                    {% if expert_formset.non_form_errors %}
                         <div class="alert alert-danger p-2 my-1">
                             Пожалуйста, измените повторяющиеся значения ниже.
                         </div>
@@ -72,7 +72,7 @@
 
                     <div class="d-flex align-items-center gap-3">
                         <span>Эксперт 1:</span>
-                        <select name="creator-expert" class="form-select-sm" disabled>
+                        <select name="creator-expert" class="form-select-sm" id="id_creator_expert" disabled>
                             <option value="" selected="">{{ request.user.get_full_name }} ({{ request.user.get_username }})</option>
                           </select>
                     </div>

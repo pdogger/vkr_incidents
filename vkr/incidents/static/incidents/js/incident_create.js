@@ -9,6 +9,11 @@ $(document).ready(function() {
         $('#add-strategy').hide();
     }
 
+    $('.expert-formset select').not(':disabled').each(function() {
+        console.log($('#id_creator_expert option').text().length);
+        $(this).children('option:contains("' + $('#id_creator_expert option').text() + '")').hide();
+    });
+
     $('#add-expert').click(function() {
         var form_idx = $('.expert-form').length;
         if(form_idx + 1 == 6) {$('#add-expert').hide();}
