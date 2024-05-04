@@ -51,8 +51,8 @@ def main():
             "User-Agent: tank\r\n" + \
             "Accept: */*\r\n" + \
             "Content-Type: application/json\r\n" + \
-            "X-CSRFToken: iSAHUUFjsz9jmZArLXl78mnpsHUb0ebi3Xtc7WM8U0mFNuL3vgnhHMqpiPfQy72T\r\n" + \
-            "Cookie: csrftoken=Vf3FnchZCBnwBFlMUtckJAda0ivPI31L; sessionid=m8blp9tp9mvl6wzgxka7f3u0bw3dtpgk\r\n" + \
+            "X-CSRFToken: \r\n" + \
+            "Cookie: \r\n" + \
             "Connection: Close"
 
         sys.stdout.write(make_ammo(method, url, headers, case, body))

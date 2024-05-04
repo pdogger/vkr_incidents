@@ -5,7 +5,8 @@ docker run \
     --net host \
     -it yandex/yandex-tank
 ```
+# Insert csrf token and cookies into headers in make_ammo.py
 https://overload.yandex.net/702670 - list
 https://overload.yandex.net/702673 - get
-https://overload.yandex.net/702674 - assess
-https://overload.yandex.net/702675 - mixed
+https://overload.yandex.net/702686 - assess
+https://overload.yandex.net/702701 - mixed
