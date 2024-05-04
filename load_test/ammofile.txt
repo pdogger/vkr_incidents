@@ -1,0 +1,32 @@
+376 
+POST /incident/assess/1 HTTP/1.1
+Host: 127.0.0.1
+User-Agent: tank
+Accept: */*
+Content-Type: application/json
+X-CSRFToken: iSAHUUFjsz9jmZArLXl78mnpsHUb0ebi3Xtc7WM8U0mFNuL3vgnhHMqpiPfQy72T
+Cookie: csrftoken=Vf3FnchZCBnwBFlMUtckJAda0ivPI31L; sessionid=m8blp9tp9mvl6wzgxka7f3u0bw3dtpgk
+Connection: Close
+Content-Length: 44
+
+{"criteria_score":[1],"basises":[[[1],[1]]]}
+302 
+GET /incident/1 HTTP/1.1
+Host: 127.0.0.1
+User-Agent: tank
+Accept: */*
+Content-Type: application/json
+X-CSRFToken: iSAHUUFjsz9jmZArLXl78mnpsHUb0ebi3Xtc7WM8U0mFNuL3vgnhHMqpiPfQy72T
+Cookie: csrftoken=Vf3FnchZCBnwBFlMUtckJAda0ivPI31L; sessionid=m8blp9tp9mvl6wzgxka7f3u0bw3dtpgk
+Connection: Close
+
+301 
+GET /incidents HTTP/1.1
+Host: 127.0.0.1
+User-Agent: tank
+Accept: */*
+Content-Type: application/json
+X-CSRFToken: iSAHUUFjsz9jmZArLXl78mnpsHUb0ebi3Xtc7WM8U0mFNuL3vgnhHMqpiPfQy72T
+Cookie: csrftoken=Vf3FnchZCBnwBFlMUtckJAda0ivPI31L; sessionid=m8blp9tp9mvl6wzgxka7f3u0bw3dtpgk
+Connection: Close
+
