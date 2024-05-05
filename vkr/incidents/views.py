@@ -179,9 +179,13 @@ def incident_assess(request, incident_id):
             incident = Incident.objects.get(id=incident_id)
         except Incident.DoesNotExist:
             raise Http404("Инцидент не существует")
+        criteries = incident.criteries.all()
+        basises = incident.basis_set.all()
+        strategies = incident.strategy_set.all()
         assessment_form = AssessmentForm()
         return render(request, "incidents/incident_assess.html",
-                      {'incident': incident, 'assessment_form': assessment_form})
+                      {'incident': incident, 'assessment_form': assessment_form,
+                      'criteries': criteries, 'basises': basises, 'strategies': strategies})
 
 
 @login_required(login_url='login')
