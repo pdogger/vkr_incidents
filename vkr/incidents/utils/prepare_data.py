@@ -6,6 +6,9 @@ def prepare_results(incident):
     results = {}
 
     for criteria in incident.results.keys():
+        incident.results[criteria] = {k: v for k, v in sorted(incident.results[criteria].items(), key=lambda item: item[1])}
+
+    for criteria in incident.results.keys():
         results[criteria] = {}
         for key in incident.results[criteria].keys():
             results[criteria][key] = {
