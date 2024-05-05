@@ -35,7 +35,7 @@
         values["basises"].push(basis);
       });
 
-      const response = await fetch("/incident/assess/{{ incident.id }}", {
+      const response = await fetch("{% url 'incident_assess' incident.id %}", {
         method: "POST",
         body: JSON.stringify(values),
         headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},

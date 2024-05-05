@@ -47,6 +47,19 @@ class IncidentForm(forms.ModelForm):
         }
 
 
+class SolutionForm(forms.Form):
+    choice = forms.ChoiceField(
+        label="Пожалуйста, укажите стратегию, позволившую устранить инцидент",
+        widget=forms.RadioSelect(attrs={'class': 'form-select-sm mb-2'})
+    )
+
+    def __init__(self, *args, choices=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if choices is not None:
+            self.fields['choice'].choices = [(choice.number, choice.name) \
+                for choice in choices] + [(len(choices), 'Инцидент не был решен')]
+
+
 ExpertFormSet = forms.inlineformset_factory(
     Incident,
     IncidentExpert,

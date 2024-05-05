@@ -39,16 +39,40 @@
             <p class="col card-subtitle text-muted text-end"><i class="bi bi-calendar-week"></i> {{ incident.created_at }}</p>
           </div>
           <!--  incident_expert and not incident_expert.scores  возможно лучше так -->
-          {% if incident_expert %}
-          <div class="row justify-content-between align-items-center pt-3">
-            <a href="{% url 'incident_assess' incident.id %}" class="col btn btn-success">Оценить стратегии</a>
-          </div>
+          {% if incident_expert and is_active %}
+            <div class="row justify-content-between align-items-center pt-3">
+              <a href="{% url 'incident_assess' incident.id %}" class="col btn btn-success">Оценить стратегии</a>
+            </div>
           {% endif %}
           {% if request.user == incident.creator.user %}
-          <form class="row justify-content-between align-items-center pt-3" action="{% url 'incident_delete' incident.id %}" method="POST">
-            {% csrf_token %}
-            <button class="col btn btn-danger" type="submit">Удалить инцидент</button>
-          </form>
+            {% if experts_with_scores|length == incident.incidentexpert_set.all|length  %}
+              <div class="row justify-content-between align-items-center pt-3">
+                <button type="button" class="col btn btn-solved btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  Завершить решение инцидента
+                </button>
+              </div>
+              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Завершить решение инцидента</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Отмена"></button>
+                    </div>
+                    <div class="modal-body">
+                      {{ solution_form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-success">Завершить</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+            <form class="row justify-content-between align-items-center pt-3" action="{% url 'incident_delete' incident.id %}" method="POST">
+              {% csrf_token %}
+              <button class="col btn btn-danger" type="submit">Удалить инцидент</button>
+            </form>
           {% endif %}
         </div>
         <div class="card-body mx-2 mb-1">

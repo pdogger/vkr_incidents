@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from .models import Incident, Expert, IncidentExpert, Status
-from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, StrategyFormSet
+from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, SolutionForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores, prepare_scores
 from .utils.prepare_data import prepare_results
 
@@ -133,9 +133,12 @@ def incident(request, incident_id):
                                                         expert=expert).first()
         results = prepare_results(incident)
 
+        solution_form = SolutionForm(choices=incident.strategy_set.all())
         return render(request, "incidents/incident.html", {
             'incident': incident,
             'incident_expert': incident_expert,
+            'is_active': (incident.status.name not in ('Решен', 'Отклонен')),
+            'solution_form': solution_form,
             'experts_with_scores': experts_with_scores,
             'results': results})
 
@@ -165,6 +168,9 @@ def incident_assess(request, incident_id):
             incident.status = Status.objects.get(name="Оценен")
             incident.results = calculate_incident(get_all_scores(incident))
             incident.save()
+        elif incident.status.name == 'Инициирован':
+            incident.status = Status.objects.get(name="В процессе оценивания")
+            incident.save()
 
         return HttpResponse(status=200)
 
@@ -176,6 +182,11 @@ def incident_assess(request, incident_id):
         assessment_form = AssessmentForm()
         return render(request, "incidents/incident_assess.html",
                       {'incident': incident, 'assessment_form': assessment_form})
+
+
+@login_required(login_url='login')
+def incident_solved(request, incident_id):
+    redirect('incidents')
 
 
 @login_required(login_url='login')

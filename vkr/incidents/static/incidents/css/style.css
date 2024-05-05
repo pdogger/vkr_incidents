@@ -67,7 +67,7 @@ body {
     transform: scale(1.05, 1.05) rotate(90deg);
 }
 
-.btn-add {
+.btn-add, .btn-solved {
     background: #47a76a;
 }
 
@@ -76,7 +76,10 @@ body {
     color: white;
 }
 
-.accordion-button:focus, .accordion-button:active {
+.accordion-button:focus,
+.accordion-button:active,
+.form-select:focus,
+.form-select:active {
     outline: none !important;
     box-shadow: none;
 }
