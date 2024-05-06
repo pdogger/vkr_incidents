@@ -4,13 +4,13 @@ overload:
   token_file: "token.txt"
 phantom:
   address: 127.0.0.1:8000
-  instances: 100
+  instances: 500
   ammofile: ammofile.txt
   ammo_type: phantom
   timeout: 10s
   load_profile:
     load_type: rps # schedule load by defining requests per second
-    schedule: const(20, 30s) # starting from 1rps growing linearly to 10rps during 10 minutes
+    schedule: const(50, 30s) # starting from 1rps growing linearly to 10rps during 10 minutes
 console:
   enabled: true # enable console output
 telegraf:

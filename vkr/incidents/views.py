@@ -1,4 +1,6 @@
+import base64
 import json
+import zlib
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -12,7 +14,7 @@ from .models import Incident, Expert, IncidentExpert, Status
 from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, SolutionForm, StrategyFormSet
 from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores, prepare_scores
 from .utils.prepare_data import prepare_results
-
+from django.views.decorators.csrf import csrf_exempt
 
 def signin(request):
     if request.method == 'GET':
@@ -156,17 +158,22 @@ def incident_assess(request, incident_id):
         except Expert.DoesNotExist:
             raise Http404("Эксперт не существует")
 
-        incident_expert = IncidentExpert.objects.get(incident=incident,
-                                                        expert=expert)
-        # incident_expert.scores = json.loads(request.body)
-        incident_expert.scores = prepare_scores(json.loads(request.body),
-                                                incident.criteries.count(),
-                                                incident.strategy_set.count())
-        incident_expert.save()
+        experts = IncidentExpert.objects.filter(incident=incident).all().order_by('number')
 
-        if check_all_experts_done(incident):
+        done = True
+        for expert_m in experts:
+            if expert_m.expert_id == expert.id:
+                incident_expert = expert_m
+                incident_expert.scores = base64.b64encode(zlib.compress(json.dumps(prepare_scores(json.loads(request.body),
+                                                5,
+                                                5)).encode())).decode()
+                incident_expert.save()
+            if expert_m.scores is None:
+                done = False
+
+        if done:
             incident.status = Status.objects.get(name="Оценен")
-            incident.results = calculate_incident(get_all_scores(incident))
+            incident.results = base64.b64encode(zlib.compress(json.dumps(calculate_incident(get_all_scores(experts))).encode())).decode()
             incident.save()
         elif incident.status.name == 'Инициирован':
             incident.status = Status.objects.get(name="В процессе оценивания")

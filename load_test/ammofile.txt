@@ -1,12 +1,12 @@
 1169 
-POST /incident/assess/1 HTTP/1.1
+POST /incident/1/assess HTTP/1.1
 Host: 127.0.0.1
 User-Agent: tank
 Accept: */*
 Content-Type: application/json
-X-CSRFToken: y3kjL9Q4T4eHp90SbPxWfapATOiFDtxXIR25AfrbSTbsWuoH6EHd4bY39dg9MITI
-Cookie: csrftoken=kYSWZgLh9Z7VHvyZ5ZkrZbJDqz8EjpwV; sessionid=8e84nuqz28mnrkkg3r2f7e3vyxe8sgaj
-Connection: Close
+X-CSRFToken: XKa7I6kFXNnGEKLLSKUthjLgUd8cvS2CiI9seGCGaPIDcVVkxhCTGZAQz4PYRHbi
+Cookie: csrftoken=v89vGKsbncv7IlkJPHSAzQZKP1RWwZjQ; sessionid=s7qkrtv62g3fu9y5nv2pcroraowjwyt4
+Connection: close
 Content-Length: 836
 
 {"criteria_score":[1,1,1,1,1,1,1,1,1,1],"basises":[[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]],[[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1]]]}
@@ -16,9 +16,9 @@ Host: 127.0.0.1
 User-Agent: tank
 Accept: */*
 Content-Type: application/json
-X-CSRFToken: y3kjL9Q4T4eHp90SbPxWfapATOiFDtxXIR25AfrbSTbsWuoH6EHd4bY39dg9MITI
-Cookie: csrftoken=kYSWZgLh9Z7VHvyZ5ZkrZbJDqz8EjpwV; sessionid=8e84nuqz28mnrkkg3r2f7e3vyxe8sgaj
-Connection: Close
+X-CSRFToken: XKa7I6kFXNnGEKLLSKUthjLgUd8cvS2CiI9seGCGaPIDcVVkxhCTGZAQz4PYRHbi
+Cookie: csrftoken=v89vGKsbncv7IlkJPHSAzQZKP1RWwZjQ; sessionid=s7qkrtv62g3fu9y5nv2pcroraowjwyt4
+Connection: close
 
 301 
 GET /incidents HTTP/1.1
@@ -26,7 +26,7 @@ Host: 127.0.0.1
 User-Agent: tank
 Accept: */*
 Content-Type: application/json
-X-CSRFToken: y3kjL9Q4T4eHp90SbPxWfapATOiFDtxXIR25AfrbSTbsWuoH6EHd4bY39dg9MITI
-Cookie: csrftoken=kYSWZgLh9Z7VHvyZ5ZkrZbJDqz8EjpwV; sessionid=8e84nuqz28mnrkkg3r2f7e3vyxe8sgaj
-Connection: Close
+X-CSRFToken: XKa7I6kFXNnGEKLLSKUthjLgUd8cvS2CiI9seGCGaPIDcVVkxhCTGZAQz4PYRHbi
+Cookie: csrftoken=v89vGKsbncv7IlkJPHSAzQZKP1RWwZjQ; sessionid=s7qkrtv62g3fu9y5nv2pcroraowjwyt4
+Connection: close
 

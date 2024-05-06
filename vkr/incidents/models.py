@@ -38,7 +38,7 @@ class Incident(models.Model):
     name = models.CharField("Название", max_length=100)
     description = models.TextField("Описание")
     created_at = models.DateTimeField("Создан")
-    results = models.JSONField("Результаты", null=True, blank=True)
+    results = models.TextField("Результаты", null=True, blank=True)
 
     creator = models.ForeignKey(Expert, verbose_name="Инициатор", on_delete=models.CASCADE,
                                 related_name="authored_incidents")
@@ -99,7 +99,7 @@ class IncidentExpert(models.Model):
     incident = models.ForeignKey(Incident, verbose_name="Инцидент", on_delete=models.CASCADE)
     expert = models.ForeignKey(Expert, verbose_name="Эксперт", on_delete=models.CASCADE)
     number = models.PositiveSmallIntegerField("Номер")
-    scores = models.JSONField("Оценки", null=True, blank=True)
+    scores = models.TextField("Оценки", null=True, blank=True)
 
     class Meta:
         verbose_name = "Эксперт по инциденту"

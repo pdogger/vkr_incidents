@@ -1,17 +1,20 @@
+import base64
+import zlib
 from incidents.models import Strategy
-
+import json
 def prepare_results(incident):
     if incident.results == None:
         return {}
     results = {}
 
     strategies = Strategy.objects.filter(incident=incident).all()
-
-    for criteria in incident.results.keys():
+    
+    incident_results = json.loads(zlib.decompress(base64.b64decode(incident.results)).decode())
+    for criteria in incident_results.keys():
         results[criteria] = {}
         for strategy in strategies:
             results[criteria][f"S{strategy.number}"] = {
-                'value': incident.results[criteria][f"S{strategy.number}"],
+                'value': incident_results[criteria][f"S{strategy.number}"],
                 'strategy_name': strategy.name
             }
 

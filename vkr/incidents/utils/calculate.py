@@ -2,9 +2,12 @@ from methods.AHPProcessor import AHPProcessor
 from methods.RankingProcessor import RankingProcessor
 from methods.PayoffMatrixProcessor import PayoffMatrixProcessor
 import numpy as np
-from pprint import pprint
+import json
 
 from incidents.models import Incident, IncidentExpert, IncidentCriteria, Strategy
+
+import zlib
+import base64
 
 def make_matrix(scores: list, num: int) -> list:
     matrix = np.ones((num, num))
@@ -44,10 +47,9 @@ def calculate_incident(scores: list) -> dict:
 
 
 def check_all_experts_done(incident: Incident) -> bool:
-    for e in incident.experts.all():
-        if IncidentExpert.objects.filter(incident_id=incident.id, expert_id=e.id,
-                                         scores__isnull = True).count() > 0:
-            return False
+    experts = IncidentExpert.objects.filter(incident_id=incident.id, scores__isnull = True)
+    if len(experts) > 0:
+        return False
     return True
 
 def prepare_scores(scores: dict, criteria_count: int, strategy_count: int) -> dict:
@@ -71,12 +73,12 @@ def prepare_scores(scores: dict, criteria_count: int, strategy_count: int) -> di
     return result
 
 
-def get_all_scores(incident: Incident) -> list:
+def get_all_scores(experts: list) -> list:
     scores = []
 
-    for expert in IncidentExpert.objects.filter(incident=incident).all().order_by('number'):
+    for expert in experts:
         # expert_scores = prepare_scores(expert.scores,
         #                                IncidentCriteria.objects.filter(incident=incident).count(),
         #                                Strategy.objects.filter(incident=incident).count())
-        scores.append(expert.scores)
+        scores.append(json.loads(zlib.decompress(base64.b64decode(expert.scores)).decode()))
     return scores
