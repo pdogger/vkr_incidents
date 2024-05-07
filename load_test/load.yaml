@@ -1,6 +1,6 @@
 phantom:
-  address: 127.0.0.1:8000
-  instances: 500
+  address: 127.0.0.1:80
+  instances: 100
   ammofile: ammofile.txt
   ammo_type: phantom
   timeout: 10s
