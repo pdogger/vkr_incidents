@@ -2,14 +2,16 @@ import base64
 import zlib
 from incidents.models import Strategy
 import json
+
+
 def prepare_results(incident):
     if incident.results == None:
         return {}
     results = {}
 
     strategies = Strategy.objects.filter(incident=incident).all()
-    
-    incident_results = json.loads(zlib.decompress(base64.b64decode(incident.results)).decode())
+
+    incident_results = dict_decode(incident.results)
     for criteria in incident_results.keys():
         results[criteria] = {}
         for strategy in strategies:
@@ -23,3 +25,11 @@ def prepare_results(incident):
                                                      key=lambda item: item[1]['value'])}
 
     return results
+
+
+def dict_encode(data: str) -> str:
+    return base64.b64encode(zlib.compress(json.dumps(data).encode())).decode()
+
+
+def dict_decode(data: str) -> str:
+    return json.loads(zlib.decompress(base64.b64decode(data)).decode())

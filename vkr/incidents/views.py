@@ -1,20 +1,15 @@
-import base64
 import json
-import zlib
-from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.db.models import Case, Count, When
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .models import Incident, Expert, IncidentExpert, Status
+from .models import Incident, Expert, IncidentExpert, Status, Strategy
 from .forms import AssessmentForm, BasisFormSet, ExpertFormSet, IncidentForm, LoginUserForm, SolutionForm, StrategyFormSet
-from .utils.calculate import calculate_incident, check_all_experts_done, get_all_scores, prepare_scores
-from .utils.prepare_data import prepare_results
-from django.views.decorators.csrf import csrf_exempt
+from .utils.calculate import calculate_incident, get_all_scores, prepare_scores
+from .utils.prepare_data import dict_decode, dict_encode, prepare_results
 
 def signin(request):
     if request.method == 'GET':
@@ -45,10 +40,6 @@ def incidents_list(request) -> HttpResponse:
         is_expert=Count(Case(When(experts__user=request.user, then=1)))
     ).order_by('-is_expert', 'status', '-created_at')
 
-    # paginator = Paginator(incidents, 1)
-
-    # page_number = request.GET.get("page")
-    # page_obj = paginator.get_page(page_number)
     return render(request, "incidents/incidents.html", {"incidents": incidents})
 
 
@@ -135,6 +126,9 @@ def incident(request, incident_id):
                                                         expert=expert).first()
         results = prepare_results(incident)
 
+        for expert in experts_with_scores:
+            expert.scores = dict_decode(expert.scores)
+
         solution_form = SolutionForm(choices=incident.strategy_set.all())
         return render(request, "incidents/incident.html", {
             'incident': incident,
@@ -164,16 +158,16 @@ def incident_assess(request, incident_id):
         for expert_m in experts:
             if expert_m.expert_id == expert.id:
                 incident_expert = expert_m
-                incident_expert.scores = base64.b64encode(zlib.compress(json.dumps(prepare_scores(json.loads(request.body),
-                                                5,
-                                                5)).encode())).decode()
+                incident_expert.scores = dict_encode(prepare_scores(json.loads(request.body),
+                                                     incident.criteries.count(),
+                                                     incident.strategy_set.count()))
                 incident_expert.save()
             if expert_m.scores is None:
                 done = False
 
         if done:
             incident.status = Status.objects.get(name="Оценен")
-            incident.results = base64.b64encode(zlib.compress(json.dumps(calculate_incident(get_all_scores(experts))).encode())).decode()
+            incident.results = dict_encode(calculate_incident(get_all_scores(experts)))
             incident.save()
         elif incident.status.name == 'Инициирован':
             incident.status = Status.objects.get(name="В процессе оценивания")
@@ -197,7 +191,25 @@ def incident_assess(request, incident_id):
 
 @login_required(login_url='login')
 def incident_solved(request, incident_id):
-    redirect('incidents')
+    if request.method == "POST":
+        try:
+            incident = Incident.objects.get(id=incident_id)
+        except Incident.DoesNotExist:
+            raise Http404("Инцидент не существует")
+
+        strategy_number = int(json.loads(request.body)) + 1
+        strategy = Strategy.objects.filter(incident=incident_id, number=strategy_number).first()
+        if strategy is None:
+            incident.status = Status.objects.get(name='Отклонен')
+            incident.save()
+        else:
+            print(strategy.incident)
+            strategy.is_solution = True
+            strategy.save()
+            incident.status = Status.objects.get(name='Решен')
+            incident.save()
+
+        return HttpResponse(status=200)
 
 
 @login_required(login_url='login')

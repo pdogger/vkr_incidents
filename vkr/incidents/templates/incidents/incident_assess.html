@@ -41,7 +41,7 @@
         headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
         mode: 'same-origin'
       });
-      // if (response) {$(location).attr('href', "{% url 'incident' incident.id %}");}
+      if (response) {$(location).attr('href', "{% url 'incident' incident.id %}");}
     }
 
     form.addEventListener("submit", (event) => {

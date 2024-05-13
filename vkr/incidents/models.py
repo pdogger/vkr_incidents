@@ -77,6 +77,7 @@ class Strategy(models.Model):
     name = models.CharField("Название", max_length=100)
     description = models.TextField("Описание")
     number = models.PositiveSmallIntegerField("Номер")
+    is_solution = models.BooleanField('Является решением', default=False)
 
     class Meta:
         verbose_name = "Стратегия устранения инцидента"

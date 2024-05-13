@@ -56,7 +56,7 @@ class SolutionForm(forms.Form):
     def __init__(self, *args, choices=None, **kwargs):
         super().__init__(*args, **kwargs)
         if choices is not None:
-            self.fields['choice'].choices = [(choice.number, choice.name) \
+            self.fields['choice'].choices = [(choice.number - 1, choice.name) \
                 for choice in choices] + [(len(choices), 'Инцидент не был решен')]
 
 
