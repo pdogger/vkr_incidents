@@ -1,6 +1,4 @@
-from functools import reduce
 import numpy as np
-
 from methods.PairwiseProcessor import PairwiseProcessor
 
 
@@ -9,8 +7,8 @@ class AHPProcessor(PairwiseProcessor):
         self.C_scores = np.array(C_scores)
         self.S_scores = np.array(S_scores)
         self.detailed = detailed
-        self.result = dict()
-        self.coherence = dict()
+        self.result = {}
+        self.coherence = {}
 
         self._C_weights: np.array | None = None
         self._S_weights: np.array | None = None
@@ -20,8 +18,8 @@ class AHPProcessor(PairwiseProcessor):
         self.coherence["C"] = self._get_coherence_value(self.C_scores, self._C_weights)
 
         self.coherence["S"] = {
-            f"C{i + 1}": self._get_coherence_value(self.S_scores[i], self._S_weights[i]) \
-                for i in range(len(self.C_scores))
+            f"C{i + 1}": self._get_coherence_value(self.S_scores[i], self._S_weights[i])
+            for i in range(len(self.C_scores))
         }
 
         return self.coherence

@@ -4,7 +4,6 @@ from django.views.generic.base import RedirectView
 
 from . import views
 
-
 urlpatterns = [
     path("", RedirectView.as_view(url=reverse_lazy('incidents')), name="index"),
     path("incident/<int:incident_id>", views.incident, name="incident"),

@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 class Criteria(models.Model):
     description = models.CharField("Описание", max_length=200)
@@ -40,8 +41,10 @@ class Incident(models.Model):
     created_at = models.DateTimeField("Создан")
     results = models.TextField("Результаты", null=True, blank=True)
 
-    creator = models.ForeignKey(Expert, verbose_name="Инициатор", on_delete=models.CASCADE,
-                                related_name="authored_incidents")
+    creator = models.ForeignKey(
+        Expert, verbose_name="Инициатор", on_delete=models.CASCADE,
+        related_name="authored_incidents",
+    )
     status = models.ForeignKey(Status, verbose_name="Статус", on_delete=models.CASCADE)
 
     criteries = models.ManyToManyField(Criteria, through="IncidentCriteria")
@@ -68,7 +71,7 @@ class Basis(models.Model):
     class Meta:
         verbose_name = "Базис инцидента"
         verbose_name_plural = "Базисы инцидента"
-        unique_together = ('incident', 'name',)
+        unique_together = ('incident', 'name')
 
 
 class Strategy(models.Model):
@@ -82,7 +85,7 @@ class Strategy(models.Model):
     class Meta:
         verbose_name = "Стратегия устранения инцидента"
         verbose_name_plural = "Стратегии устранения инцидента"
-        unique_together = ('incident', 'name',)
+        unique_together = ('incident', 'name')
 
 
 class IncidentCriteria(models.Model):
@@ -93,7 +96,7 @@ class IncidentCriteria(models.Model):
     class Meta:
         verbose_name = "Критерий ранжирования инцидента"
         verbose_name_plural = "Критерии ранжирования инцидента"
-        unique_together = ('incident', 'criteria',)
+        unique_together = ('incident', 'criteria')
 
 
 class IncidentExpert(models.Model):
@@ -105,4 +108,4 @@ class IncidentExpert(models.Model):
     class Meta:
         verbose_name = "Эксперт по инциденту"
         verbose_name_plural = "Эксперты по инциденту"
-        unique_together = ('incident', 'expert',)
+        unique_together = ('incident', 'expert')

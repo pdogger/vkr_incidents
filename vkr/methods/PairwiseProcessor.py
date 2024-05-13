@@ -1,21 +1,21 @@
 from functools import reduce
+
 import numpy as np
 
 R_table = {
     3: 0.58,
     4: 0.9,
-    5: 1.12
+    5: 1.12,
 }
 
 
 class PairwiseProcessor:
     def __init__(self, S_scores: list) -> None:
         self.S_scores = np.array(S_scores)
-        self.result = dict()
-        self.coherence = dict()
+        self.result = {}
+        self.coherence = {}
 
         self._V: np.array | None = None
-
 
     def _get_weights(self, X: np.array) -> np.array:
         V = np.array([pow(reduce(lambda a, b: a*b, alt), 1 / X.shape[0]) for alt in X])

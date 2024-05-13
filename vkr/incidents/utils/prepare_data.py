@@ -1,11 +1,12 @@
 import base64
-import zlib
-from incidents.models import Strategy
 import json
+import zlib
+
+from incidents.models import Strategy
 
 
 def prepare_results(incident):
-    if incident.results == None:
+    if incident.results is None:
         return {}
     results = {}
 
@@ -17,12 +18,16 @@ def prepare_results(incident):
         for strategy in strategies:
             results[criteria][f"S{strategy.number}"] = {
                 'value': incident_results[criteria][f"S{strategy.number}"],
-                'strategy_name': strategy.name
+                'strategy_name': strategy.name,
             }
 
     for criteria in results.keys():
-        results[criteria] = {k: v for k, v in sorted(results[criteria].items(),
-                                                     key=lambda item: item[1]['value'])}
+        results[criteria] = {
+            k: v for k, v in sorted(
+                results[criteria].items(),
+                key=lambda item: item[1]['value'],
+            )
+        }
 
     return results
 

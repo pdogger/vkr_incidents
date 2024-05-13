@@ -8,7 +8,7 @@ from .models import (
     IncidentCriteria,
     IncidentExpert,
     Status,
-    Strategy
+    Strategy,
 )
 
 
@@ -30,6 +30,7 @@ class ExpertInline(admin.TabularInline):
 class StrategyInline(admin.TabularInline):
     model = Strategy
     extra = 1
+
 
 class BasisAdmin(admin.ModelAdmin):
     list_display = ('name', 'id', 'incident')
