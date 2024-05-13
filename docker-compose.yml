@@ -2,8 +2,7 @@ version: '3'
 
 services:
   app:
-    # image: registry.miem.hse.ru/decisionincidents/incidentdecisionsystem
-    build: .
+    image: registry.miem.hse.ru/decisionincidents/incidentdecisionsystem
     command:
     - sh
     - -c
